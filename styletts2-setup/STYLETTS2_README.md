@@ -1,14 +1,18 @@
 # StyleTTS2 Web UI
 
-A clean installation of StyleTTS2 with its own isolated virtual environment on the E drive.
+A clean installation of StyleTTS2 with its own isolated virtual environment.
 
 ## 📁 Installation Location
 
-- **Root Directory**: `E:\AI\tts-webui\styletts2\`
-- **Virtual Environment**: `E:\AI\tts-webui\styletts2\.venv\`
-- **Models**: `E:\AI\tts-webui\styletts2\models\`
-- **Outputs**: `E:\AI\tts-webui\styletts2\outputs\`
-- **Voice Samples**: `E:\AI\tts-webui\styletts2\voice-samples\`
+**Default Location:** `E:\AI\tts-webui\styletts2\`
+
+**Note:** You can override the installation path by setting the `STYLETTS2_PATH` environment variable.
+
+- **Root Directory**: `E:\AI\tts-webui\styletts2\` (or `%STYLETTS2_PATH%`)
+- **Virtual Environment**: `.venv\`
+- **Models**: `models\`
+- **Outputs**: `outputs\`
+- **Voice Samples**: `voice-samples\`
 
 ## 🚀 Quick Start
 
@@ -26,7 +30,10 @@ launch_styletts2.bat
 
 **Option 3: Direct Python**
 ```powershell
-& E:\AI\tts-webui\styletts2\.venv\Scripts\Activate.ps1
+# Set path if using non-default location
+$env:STYLETTS2_PATH = "E:\AI\tts-webui\styletts2"
+cd $env:STYLETTS2_PATH
+& .venv\Scripts\Activate.ps1
 python styletts2_webui.py --server_port 7860
 ```
 
@@ -83,19 +90,26 @@ Each has its own virtual environment to prevent dependency conflicts.
 ### Model Loading Issues
 If the model fails to load, try:
 ```powershell
-& E:\AI\tts-webui\styletts2\.venv\Scripts\pip.exe install styletts2 --force-reinstall
+# Set path if using non-default location
+$env:STYLETTS2_PATH = "E:\AI\tts-webui\styletts2"
+cd $env:STYLETTS2_PATH
+& .venv\Scripts\pip.exe install styletts2 --force-reinstall
 ```
 
 ### Dependency Conflicts
 To reinstall dependencies:
 ```powershell
-& E:\AI\tts-webui\styletts2\.venv\Scripts\pip.exe install -r requirements.txt --force-reinstall
+$env:STYLETTS2_PATH = "E:\AI\tts-webui\styletts2"
+cd $env:STYLETTS2_PATH
+& .venv\Scripts\pip.exe install -r requirements.txt --force-reinstall
 ```
 
 ### Virtual Environment Issues
 To recreate the virtual environment:
 ```powershell
-Remove-Item -Path "E:\AI\tts-webui\styletts2\.venv" -Recurse -Force
+$env:STYLETTS2_PATH = "E:\AI\tts-webui\styletts2"
+cd $env:STYLETTS2_PATH
+Remove-Item -Path ".venv" -Recurse -Force
 python -m venv .venv
 & .venv\Scripts\pip.exe install -r requirements.txt
 ```

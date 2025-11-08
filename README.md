@@ -250,6 +250,7 @@ Thank you to all the researchers and developers who made this toolkit possible!
 
 ### Documentation
 - [Installation Guide](docs/INSTALLATION.md)
+- [Path Configuration Guide](docs/PATH_CONFIGURATION.md)
 - [Workflow Guide](docs/WORKFLOW_GUIDE.md)
 - [Dataset Prep Guide](docs/DATASET_PREP_GUIDE.md)
 - [Troubleshooting](docs/TROUBLESHOOTING.md)

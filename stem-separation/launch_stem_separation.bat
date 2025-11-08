@@ -1,5 +1,10 @@
 @echo off
 REM Stem Separation Launcher
+REM 
+REM Configuration:
+REM - Set STEM_SEPARATION_PATH environment variable to override default path
+REM - Set FFMPEG_PATH environment variable to override FFmpeg location
+REM - Set CACHE_DIR environment variable to override cache location
 
 echo ========================================
 echo Stem Separation Web Interface
@@ -12,7 +17,7 @@ REM Check if venv exists
 if not exist "venv\Scripts\activate.bat" (
     echo ❌ Virtual environment not found!
     echo.
-    echo Please run install_stem_separation.bat first.
+    echo Please run install.ps1 or install_stem_separation.bat first.
     pause
     exit /b 1
 )
@@ -20,15 +25,54 @@ if not exist "venv\Scripts\activate.bat" (
 REM Activate local virtual environment
 call venv\Scripts\activate.bat
 
-REM Add FFmpeg to PATH
-set PATH=E:\AI\tools\ffmpeg\bin;%PATH%
+REM Add FFmpeg to PATH (check multiple locations)
+where ffmpeg >nul 2>&1
+if %ERRORLEVEL% EQU 0 (
+    echo FFmpeg found in system PATH
+) else (
+    REM Try common locations
+    if not "%FFMPEG_PATH%"=="" (
+        if exist "%FFMPEG_PATH%\ffmpeg.exe" (
+            set PATH=%FFMPEG_PATH%;%PATH%
+            echo FFmpeg found at: %FFMPEG_PATH%
+        )
+    ) else (
+        if exist "E:\AI\tools\ffmpeg\bin\ffmpeg.exe" (
+            set PATH=E:\AI\tools\ffmpeg\bin;%PATH%
+            echo FFmpeg found at: E:\AI\tools\ffmpeg\bin
+        ) else if exist "C:\ffmpeg\bin\ffmpeg.exe" (
+            set PATH=C:\ffmpeg\bin;%PATH%
+            echo FFmpeg found at: C:\ffmpeg\bin
+        ) else (
+            echo ⚠️  FFmpeg not found. Some features may not work.
+            echo    Install FFmpeg or set FFMPEG_PATH environment variable.
+        )
+    )
+)
 
-REM Force all caches to E drive to avoid filling C drive
-set PIP_CACHE_DIR=E:\AI\.cache\pip
-set HF_HOME=E:\AI\.cache\huggingface
-set TORCH_HOME=E:\AI\.cache\torch
-set XDG_CACHE_HOME=E:\AI\.cache
+REM Set cache directories (configurable via CACHE_DIR environment variable)
+if not "%CACHE_DIR%"=="" (
+    set PIP_CACHE_DIR=%CACHE_DIR%\pip
+    set HF_HOME=%CACHE_DIR%\huggingface
+    set TORCH_HOME=%CACHE_DIR%\torch
+    set XDG_CACHE_HOME=%CACHE_DIR%
+    echo Cache directory: %CACHE_DIR%
+) else (
+    REM Try E: drive first (if available), otherwise use default locations
+    if exist "E:\" (
+        if not exist "E:\.cache" mkdir "E:\.cache" 2>nul
+        set PIP_CACHE_DIR=E:\.cache\pip
+        set HF_HOME=E:\.cache\huggingface
+        set TORCH_HOME=E:\.cache\torch
+        set XDG_CACHE_HOME=E:\.cache
+        echo Cache directory: E:\.cache
+    ) else (
+        REM Use default locations (will use user's AppData)
+        echo Using default cache locations
+    )
+)
 
+echo.
 echo Starting Stem Separation Web Interface...
 echo Web interface will open at: http://127.0.0.1:7861
 echo.

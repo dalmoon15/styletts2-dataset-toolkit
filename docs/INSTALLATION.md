@@ -107,19 +107,20 @@ python -c "import styletts2; print('StyleTTS2 installed successfully!')"
 
 ### Step 4: Configure FFmpeg
 
-**If FFmpeg is in a custom location:**
+**Option A: Use Environment Variable (Recommended)**
+```powershell
+# Set FFmpeg path
+$env:FFMPEG_PATH = "C:\ffmpeg\bin"
+```
 
-1. Edit `stem-separation\launch_stem_separation.bat`:
-   ```bat
-   REM Update this line:
-   set PATH=E:\AI\tools\ffmpeg\bin;%PATH%
-   ```
+**Option B: Add to System PATH**
+Add FFmpeg to your system PATH permanently.
 
-2. Edit `styletts2-setup\launch_styletts2.ps1`:
-   ```powershell
-   # Update this line:
-   $env:PATH = "E:\AI\tools\ffmpeg\bin;$env:PATH"
-   ```
+**Option C: Launcher Auto-Detection**
+The launchers will automatically try common locations:
+- `E:\AI\tools\ffmpeg\bin`
+- `C:\ffmpeg\bin`
+- `%ProgramFiles%\ffmpeg\bin`
 
 **Verify FFmpeg:**
 ```powershell
@@ -127,6 +128,8 @@ ffmpeg -version
 ```
 
 Should show FFmpeg version info.
+
+**Note:** For detailed path configuration, see [PATH_CONFIGURATION.md](PATH_CONFIGURATION.md).
 
 ---
 
