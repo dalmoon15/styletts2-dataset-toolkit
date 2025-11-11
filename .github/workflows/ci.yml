@@ -30,7 +30,8 @@ jobs:
         )
         $found = $false
         foreach ($path in $hardcodedPaths) {
-          $matches = Select-String -Path "*.py","*.ps1","*.bat" -Pattern $path -Recurse -ErrorAction SilentlyContinue
+          $files = Get-ChildItem -Path . -Include "*.py","*.ps1","*.bat" -Recurse -File | Where-Object { $_.FullName -notmatch "\\\.git\\" }
+          $matches = $files | Select-String -Pattern $path -ErrorAction SilentlyContinue
           if ($matches) {
             Write-Host "::error::Found hardcoded path: $path"
             $matches | ForEach-Object { Write-Host "  - $($_.Path):$($_.LineNumber)" }
@@ -91,7 +92,8 @@ jobs:
         )
         $found = $false
         foreach ($pattern in $secretPatterns) {
-          $matches = Select-String -Path "*.py","*.ps1","*.bat","*.md" -Pattern $pattern -Recurse -ErrorAction SilentlyContinue | Where-Object { $_.Path -notmatch "\\\.git\\" -and $_.Line -notmatch "#.*example|#.*placeholder" }
+          $files = Get-ChildItem -Path . -Include "*.py","*.ps1","*.bat","*.md" -Recurse -File | Where-Object { $_.FullName -notmatch "\\\.git\\" }
+          $matches = $files | Select-String -Pattern $pattern -ErrorAction SilentlyContinue | Where-Object { $_.Line -notmatch "#.*example|#.*placeholder" }
           if ($matches) {
             Write-Host "::warning::Potential secret found (may be false positive):"
             $matches | ForEach-Object { Write-Host "  - $($_.Path):$($_.LineNumber)" }
