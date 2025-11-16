@@ -8,10 +8,11 @@ Write-Host "       StyleTTS2 Fine-Tuning Training" -ForegroundColor Cyan
 Write-Host "===============================================" -ForegroundColor Cyan
 Write-Host ""
 
-# Set paths
-$VENV_PATH = "E:\AI\tts-webui\styletts2\.venv"
-$TRAIN_SCRIPT = "E:\AI\tts-webui\styletts2\StyleTTS2\train_finetune.py"
-$CONFIG_PATH = "E:\AI\tts-webui\styletts2\StyleTTS2\Configs\config_ft.yml"
+# Set paths (relative to script directory)
+$SCRIPT_DIR = Split-Path -Parent $MyInvocation.MyCommand.Path
+$VENV_PATH = "$SCRIPT_DIR\.venv"
+$TRAIN_SCRIPT = "$SCRIPT_DIR\StyleTTS2\train_finetune.py"
+$CONFIG_PATH = "$SCRIPT_DIR\StyleTTS2\Configs\config_ft.yml"
 
 # Check if virtual environment exists
 if (-not (Test-Path "$VENV_PATH\Scripts\python.exe")) {
@@ -44,7 +45,7 @@ Write-Host "Training logs will be saved to the Models directory." -ForegroundCol
 Write-Host ""
 
 # Change to the StyleTTS2 directory
-Set-Location "E:\AI\tts-webui\styletts2\StyleTTS2"
+Set-Location "$SCRIPT_DIR\StyleTTS2"
 
 # Run training with the virtual environment's Python
 & "$VENV_PATH\Scripts\python.exe" $TRAIN_SCRIPT --config_path $CONFIG_PATH

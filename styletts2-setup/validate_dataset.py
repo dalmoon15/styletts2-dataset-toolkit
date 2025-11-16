@@ -101,8 +101,8 @@ def main():
         # Default: validate common manifest locations
         base_path = Path(__file__).parent
         manifests = [
-            base_path / "datasets" / "jinwoo-sung-dataset" / "train_list.txt",
-            base_path / "datasets" / "jinwoo-sung-dataset" / "val_list.txt",
+            base_path / "datasets" / "your-dataset-name" / "train_list.txt",
+            base_path / "datasets" / "your-dataset-name" / "val_list.txt",
         ]
         
         all_clean = True

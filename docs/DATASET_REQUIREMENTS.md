@@ -70,8 +70,8 @@ Whisper will produce transcripts with digits/symbols. **This is expected and wil
 If you want to double-check the exported dataset:
 
 ```powershell
-cd E:\AI\tts-webui\styletts2
-.\.venv\Scripts\python validate_dataset.py datasets\your-dataset\train_list.txt
+cd styletts2-setup
+python validate_dataset.py datasets\your-dataset\train_list.txt
 ```
 
 This is **optional** since the export step already normalizes everything. Use this only if:

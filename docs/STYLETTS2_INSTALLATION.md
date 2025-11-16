@@ -41,7 +41,7 @@ This guide walks you through setting up StyleTTS2 for fine-tuning on your custom
 
 ```powershell
 # Navigate to your projects directory
-cd E:\AI\tts-webui
+cd C:\Projects
 
 # Clone the official StyleTTS2 repository
 git clone https://github.com/yl4579/StyleTTS2.git
@@ -103,7 +103,7 @@ Use the `requirements.txt` from this toolkit:
 
 ```powershell
 # Copy requirements.txt from toolkit
-copy E:\styletts2-dataset-toolkit\styletts2-setup\requirements.txt .\requirements_toolkit.txt
+copy <TOOLKIT_PATH>\styletts2-setup\requirements.txt .\requirements_toolkit.txt
 
 # Install dependencies (this may take 10-15 minutes)
 pip install -r requirements_toolkit.txt
@@ -225,10 +225,10 @@ This toolkit provides patches that fix critical bugs for Windows and add device 
 
 ```powershell
 # From the StyleTTS2 directory
-cd E:\AI\tts-webui\StyleTTS2
+cd C:\Projects\StyleTTS2
 
 # Run the patch application script from toolkit
-E:\styletts2-dataset-toolkit\styletts2-setup\apply_patches.ps1
+C:\Projects\styletts2-dataset-toolkit\styletts2-setup\apply_patches.ps1
 ```
 
 ### What Gets Patched
@@ -245,11 +245,11 @@ E:\styletts2-dataset-toolkit\styletts2-setup\apply_patches.ps1
 
 ```powershell
 # Copy patches manually
-copy E:\styletts2-dataset-toolkit\styletts2-setup\patches\train_finetune.py .\
-copy E:\styletts2-dataset-toolkit\styletts2-setup\patches\meldataset.py .\
-copy E:\styletts2-dataset-toolkit\styletts2-setup\patches\utils.py .\
-copy E:\styletts2-dataset-toolkit\styletts2-setup\patches\models.py .\
-copy E:\styletts2-dataset-toolkit\styletts2-setup\patches\Modules\*.py .\Modules\
+copy <TOOLKIT_PATH>\styletts2-setup\patches\train_finetune.py .\
+copy <TOOLKIT_PATH>\styletts2-setup\patches\meldataset.py .\
+copy <TOOLKIT_PATH>\styletts2-setup\patches\utils.py .\
+copy <TOOLKIT_PATH>\styletts2-setup\patches\models.py .\
+copy <TOOLKIT_PATH>\styletts2-setup\patches\Modules\*.py .\Modules\
 ```
 
 ---
@@ -260,7 +260,7 @@ copy E:\styletts2-dataset-toolkit\styletts2-setup\patches\Modules\*.py .\Modules
 
 ```powershell
 # Copy the patched config from toolkit
-copy E:\styletts2-dataset-toolkit\styletts2-setup\configs\config_ft.yml .\Configs\config_ft.yml
+copy <TOOLKIT_PATH>\styletts2-setup\configs\config_ft.yml .\Configs\config_ft.yml
 ```
 
 ### 2. Edit Configuration
@@ -272,8 +272,8 @@ Open `Configs\config_ft.yml` and update paths:
 device: 'auto'
 
 # Point to your prepared dataset
-train_data: E:/your-dataset/train_list.txt
-val_data: E:/your-dataset/val_list.txt
+train_data: datasets/your-dataset/train_list.txt
+val_data: datasets/your-dataset/val_list.txt
 
 # Set batch sizes (adjust for your GPU VRAM)
 batch_size: 16  # Reduce to 8 or 4 if out of memory
@@ -309,11 +309,11 @@ PLBERT_dir: Utils/PLBERT/
 
 ```powershell
 # Check that manifest files exist
-Test-Path E:\your-dataset\train_list.txt
-Test-Path E:\your-dataset\val_list.txt
+Test-Path datasets\your-dataset\train_list.txt
+Test-Path datasets\your-dataset\val_list.txt
 
 # Preview first few lines
-Get-Content E:\your-dataset\train_list.txt -First 5
+Get-Content datasets\your-dataset\train_list.txt -First 5
 ```
 
 **Expected format**: `path/to/audio.wav|Transcription text here.|speaker_id`
@@ -347,8 +347,8 @@ print(f'Device: {config[\"device\"]}')
 Before training, use the toolkit's validation script:
 
 ```powershell
-python E:\styletts2-dataset-toolkit\styletts2-setup\validate_dataset.py E:\your-dataset\train_list.txt
-python E:\styletts2-dataset-toolkit\styletts2-setup\validate_dataset.py E:\your-dataset\val_list.txt
+python <TOOLKIT_PATH>\styletts2-setup\validate_dataset.py datasets\your-dataset\train_list.txt
+python <TOOLKIT_PATH>\styletts2-setup\validate_dataset.py datasets\your-dataset\val_list.txt
 ```
 
 **Fix any errors** before proceeding to training!
@@ -361,7 +361,7 @@ python E:\styletts2-dataset-toolkit\styletts2-setup\validate_dataset.py E:\your-
 
 ```powershell
 # Copy launcher from toolkit
-copy E:\styletts2-dataset-toolkit\styletts2-setup\train_styletts2.ps1 .\
+copy <TOOLKIT_PATH>\styletts2-setup\train_styletts2.ps1 .\
 
 # Edit train_styletts2.ps1 to set correct paths
 # Then run:
@@ -416,8 +416,8 @@ RuntimeError: size mismatch for text_encoder.embedding.weight
 **Solution**: Your dataset has characters outside the 178-token vocabulary. Run normalization:
 
 ```powershell
-python E:\styletts2-dataset-toolkit\styletts2-setup\normalize_dataset.py E:\your-dataset\train_list.txt
-python E:\styletts2-dataset-toolkit\styletts2-setup\normalize_dataset.py E:\your-dataset\val_list.txt
+python <TOOLKIT_PATH>\styletts2-setup\normalize_dataset.py datasets\your-dataset\train_list.txt
+python <TOOLKIT_PATH>\styletts2-setup\normalize_dataset.py datasets\your-dataset\val_list.txt
 ```
 
 **3. BERT Length Error**

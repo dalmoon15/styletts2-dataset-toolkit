@@ -67,7 +67,7 @@ Link to any related issues or discussions.
 ## ✅ Checklist
 
 - [ ] I have checked existing issues to see if this feature was already requested
-- [ ] I have checked the [Documentation](https://github.com/Lostenergydrink/styletts2-dataset-toolkit/tree/main/docs) to see if this is already possible
+- [ ] I have checked the [Documentation](https://github.com/YOUR_USERNAME/styletts2-dataset-toolkit/tree/main/docs) to see if this is already possible
 - [ ] I have provided clear use cases for this feature
 
 ---

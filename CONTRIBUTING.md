@@ -51,7 +51,7 @@ Have an idea for a new feature? Open an issue using the [Feature Request templat
 
 1. **Clone the repository:**
    ```powershell
-   git clone https://github.com/Lostenergydrink/styletts2-dataset-toolkit.git
+   git clone https://github.com/YOUR_USERNAME/styletts2-dataset-toolkit.git
    cd styletts2-dataset-toolkit
    ```
 

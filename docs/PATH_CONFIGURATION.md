@@ -8,10 +8,10 @@ This guide explains how to configure paths for the StyleTTS2 Dataset Toolkit.
 
 The toolkit references actual implementations located in separate directories:
 
-- **Stem Separation**: Located at `E:\AI\stem-separation-webui\` (default)
-- **StyleTTS2**: Located at `E:\AI\tts-webui\styletts2\` (default)
+- **Stem Separation**: Located at `<your-path>\stem-separation-webui\` (configurable)
+- **StyleTTS2**: Located at `<your-path>\styletts2\` (configurable)
 
-The repository (`E:\styletts2-dataset-toolkit\`) contains launchers and documentation that reference these implementations.
+The repository contains launchers and documentation that reference these implementations.
 
 ---
 
@@ -74,13 +74,11 @@ $env:STEM_SEPARATION_PATH = "C:\MyProjects\stem-separation"
 **FFmpeg Resolution Priority:**
 1. System PATH
 2. `FFMPEG_PATH` environment variable
-3. `E:\AI\tools\ffmpeg\bin`
-4. `C:\ffmpeg\bin`
+3. `C:\ffmpeg\bin`
 
 **Cache Resolution Priority:**
 1. `CACHE_DIR` environment variable
-2. `E:\.cache\` (if E: drive exists)
-3. Default system cache locations (AppData)
+2. Default system cache locations (typically `%USERPROFILE%\.cache`)
 
 ---
 
@@ -91,11 +89,11 @@ $env:STEM_SEPARATION_PATH = "C:\MyProjects\stem-separation"
 If you installed StyleTTS2 in a different location:
 
 ```powershell
-# Set environment variable
+# Example: Set StyleTTS2 location
 $env:STYLETTS2_PATH = "D:\Projects\StyleTTS2"
 
-# Launch
-cd E:\styletts2-dataset-toolkit\styletts2-setup
+# Launch (from toolkit directory)
+cd styletts2-setup
 .\launch_styletts2.ps1
 ```
 
@@ -104,11 +102,11 @@ cd E:\styletts2-dataset-toolkit\styletts2-setup
 If FFmpeg is installed in a custom location:
 
 ```powershell
-# Set environment variable
+# Example: Custom FFmpeg location
 $env:FFMPEG_PATH = "C:\Tools\ffmpeg\bin"
 
-# Launch
-cd E:\styletts2-dataset-toolkit\stem-separation
+# Launch (from toolkit directory)
+cd stem-separation
 .\launch_stem_separation.bat
 ```
 
@@ -117,11 +115,11 @@ cd E:\styletts2-dataset-toolkit\stem-separation
 To use a different drive for cache:
 
 ```powershell
-# Set environment variable
+# Example: Cache on faster drive
 $env:CACHE_DIR = "D:\ML_Cache"
 
-# Launch
-cd E:\styletts2-dataset-toolkit\stem-separation
+# Launch (from toolkit directory)
+cd stem-separation
 .\launch_stem_separation.bat
 ```
 
@@ -136,16 +134,16 @@ To set environment variables permanently (Windows):
 
 2. **Via PowerShell (User-level):**
    ```powershell
-   [System.Environment]::SetEnvironmentVariable("STYLETTS2_PATH", "E:\AI\tts-webui\styletts2", "User")
-   [System.Environment]::SetEnvironmentVariable("FFMPEG_PATH", "E:\AI\tools\ffmpeg\bin", "User")
-   [System.Environment]::SetEnvironmentVariable("CACHE_DIR", "E:\.cache", "User")
+   [System.Environment]::SetEnvironmentVariable("STYLETTS2_PATH", "C:\Projects\styletts2", "User")
+   [System.Environment]::SetEnvironmentVariable("FFMPEG_PATH", "C:\ffmpeg\bin", "User")
+   [System.Environment]::SetEnvironmentVariable("CACHE_DIR", "C:\.cache", "User")
    ```
 
 3. **Via Command Prompt:**
    ```cmd
-   setx STYLETTS2_PATH "E:\AI\tts-webui\styletts2"
-   setx FFMPEG_PATH "E:\AI\tools\ffmpeg\bin"
-   setx CACHE_DIR "E:\.cache"
+   setx STYLETTS2_PATH "C:\Projects\styletts2"
+   setx FFMPEG_PATH "C:\ffmpeg\bin"
+   setx CACHE_DIR "C:\.cache"
    ```
 
 **Note:** After setting permanent environment variables, restart your terminal/PowerShell for changes to take effect.

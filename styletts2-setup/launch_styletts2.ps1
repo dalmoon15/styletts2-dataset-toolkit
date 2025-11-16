@@ -16,11 +16,9 @@ Write-Host ""
 # Priority: 1. Environment variable, 2. Default location, 3. Current directory
 $STYLETTS2_BASE = $env:STYLETTS2_PATH
 if ([string]::IsNullOrEmpty($STYLETTS2_BASE)) {
-    # Try default location
-    $defaultPath = "E:\AI\tts-webui\styletts2"
-    if (Test-Path $defaultPath) {
-        $STYLETTS2_BASE = $defaultPath
-    } else {
+    # Use current directory as default
+    $STYLETTS2_BASE = Split-Path -Parent $MyInvocation.MyCommand.Path
+    if (-not (Test-Path "$STYLETTS2_BASE\styletts2_webui.py")) {
         # Fallback to current directory (for portable installations)
         $STYLETTS2_BASE = $PSScriptRoot
         Write-Host "⚠️  Using current directory as StyleTTS2 path" -ForegroundColor Yellow
@@ -64,7 +62,6 @@ if ($ffmpegInPath) {
     # Try common locations
     $ffmpegPaths = @(
         $env:FFMPEG_PATH,
-        "E:\AI\tools\ffmpeg\bin",
         "C:\ffmpeg\bin",
         "$env:ProgramFiles\ffmpeg\bin",
         "$env:ProgramFiles(x86)\ffmpeg\bin"

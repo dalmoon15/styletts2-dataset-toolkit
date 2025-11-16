@@ -190,13 +190,13 @@ git pull origin main
 
 # The fix is in styletts2-setup/
 # Copy updated file to your StyleTTS2 installation:
-copy styletts2-setup\styletts2_webui.py E:\AI\tts-webui\styletts2\
+copy styletts2-setup\styletts2_webui.py <your-styletts2-path>\
 
 # Copy port utility:
-copy styletts2-setup\check_port.ps1 E:\AI\tts-webui\styletts2\
+copy styletts2-setup\check_port.ps1 <your-styletts2-path>\
 
 # Copy updated launcher:
-copy styletts2-setup\launch_styletts2.ps1 E:\AI\tts-webui\styletts2\
+copy styletts2-setup\launch_styletts2.ps1 <your-styletts2-path>\
 ```
 
 ---

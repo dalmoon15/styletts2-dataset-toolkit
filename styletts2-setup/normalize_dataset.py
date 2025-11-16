@@ -186,8 +186,8 @@ def main():
         print("With --apply: Creates backup and applies changes")
         print()
         print("Example:")
-        print("  python normalize_dataset.py datasets/jinwoo-sung-dataset/train_list.txt")
-        print("  python normalize_dataset.py datasets/jinwoo-sung-dataset/train_list.txt --apply")
+        print("  python normalize_dataset.py datasets/your-dataset-name/train_list.txt")
+        print("  python normalize_dataset.py datasets/your-dataset-name/train_list.txt --apply")
         sys.exit(1)
     
     file_path = sys.argv[1]

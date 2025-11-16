@@ -17,7 +17,7 @@ If you discover a security vulnerability, please **do not** open a public issue.
 
 ### Option 1: GitHub Security Advisory (Preferred)
 
-1. Go to the [Security tab](https://github.com/Lostenergydrink/styletts2-dataset-toolkit/security) in the repository
+1. Go to the [Security tab](https://github.com/YOUR_USERNAME/styletts2-dataset-toolkit/security) in the repository
 2. Click "Report a vulnerability"
 3. Fill out the security advisory form
 
@@ -136,7 +136,7 @@ Security updates will be:
 
 ## Questions?
 
-If you have questions about this security policy, please open a [GitHub Discussion](https://github.com/Lostenergydrink/styletts2-dataset-toolkit/discussions) (not an issue).
+If you have questions about this security policy, please open a [GitHub Discussion](https://github.com/YOUR_USERNAME/styletts2-dataset-toolkit/discussions) (not an issue).
 
 ---
 

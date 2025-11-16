@@ -38,10 +38,10 @@ This is the main StyleTTS2 model checkpoint trained on the LibriTTS dataset. You
 **Using PowerShell:**
 ```powershell
 # Create directory
-New-Item -ItemType Directory -Force -Path "E:\AI\tts-webui\StyleTTS2\Models\LibriTTS"
+New-Item -ItemType Directory -Force -Path "C:\Projects\StyleTTS2\Models\LibriTTS"
 
 # After manual download, move file:
-Move-Item "Downloads\epochs_2nd_00020.pth" "E:\AI\tts-webui\StyleTTS2\Models\LibriTTS\"
+Move-Item "Downloads\epochs_2nd_00020.pth" "C:\Projects\StyleTTS2\Models\LibriTTS\"
 ```
 
 ### Verification
@@ -77,10 +77,10 @@ The ASR model is used during training to extract phoneme-level alignments from y
 **Using PowerShell:**
 ```powershell
 # Create directory
-New-Item -ItemType Directory -Force -Path "E:\AI\tts-webui\StyleTTS2\Utils\ASR"
+New-Item -ItemType Directory -Force -Path "C:\Projects\StyleTTS2\Utils\ASR"
 
 # After manual download:
-Move-Item "Downloads\epoch_00080.pth" "E:\AI\tts-webui\StyleTTS2\Utils\ASR\"
+Move-Item "Downloads\epoch_00080.pth" "C:\Projects\StyleTTS2\Utils\ASR\"
 ```
 
 ### Additional File
@@ -116,10 +116,10 @@ The F0 (fundamental frequency) model extracts pitch information from audio. This
 **Using PowerShell:**
 ```powershell
 # Create directory
-New-Item -ItemType Directory -Force -Path "E:\AI\tts-webui\StyleTTS2\Utils\JDC"
+New-Item -ItemType Directory -Force -Path "C:\Projects\StyleTTS2\Utils\JDC"
 
 # After manual download:
-Move-Item "Downloads\bst.t7" "E:\AI\tts-webui\StyleTTS2\Utils\JDC\"
+Move-Item "Downloads\bst.t7" "C:\Projects\StyleTTS2\Utils\JDC\"
 ```
 
 ### Verification
@@ -156,8 +156,8 @@ Multiple files from HuggingFace repository:
 git lfs install
 
 # Create directory
-New-Item -ItemType Directory -Force -Path "E:\AI\tts-webui\StyleTTS2\Utils"
-cd "E:\AI\tts-webui\StyleTTS2\Utils"
+New-Item -ItemType Directory -Force -Path "C:\Projects\StyleTTS2\Utils"
+cd "C:\Projects\StyleTTS2\Utils"
 
 # Clone the PLBERT repository
 git clone https://huggingface.co/yl4579/StyleTTS2-LibriTTS PLBERT
@@ -178,12 +178,12 @@ git clone https://huggingface.co/yl4579/StyleTTS2-LibriTTS PLBERT
 **Using PowerShell:**
 ```powershell
 # Create directory
-New-Item -ItemType Directory -Force -Path "E:\AI\tts-webui\StyleTTS2\Utils\PLBERT"
+New-Item -ItemType Directory -Force -Path "C:\Projects\StyleTTS2\Utils\PLBERT"
 
 # After manual downloads, move files:
-Move-Item "Downloads\config.json" "E:\AI\tts-webui\StyleTTS2\Utils\PLBERT\"
-Move-Item "Downloads\pytorch_model.bin" "E:\AI\tts-webui\StyleTTS2\Utils\PLBERT\"
-Move-Item "Downloads\step_2000000.t7" "E:\AI\tts-webui\StyleTTS2\Utils\PLBERT\"
+Move-Item "Downloads\config.json" "C:\Projects\StyleTTS2\Utils\PLBERT\"
+Move-Item "Downloads\pytorch_model.bin" "C:\Projects\StyleTTS2\Utils\PLBERT\"
+Move-Item "Downloads\step_2000000.t7" "C:\Projects\StyleTTS2\Utils\PLBERT\"
 # ... repeat for other files
 ```
 
@@ -284,8 +284,8 @@ PLBERT_dir: Utils/PLBERT/
 
 **Important**: Use forward slashes `/` even on Windows, or absolute paths:
 ```yaml
-# Alternative: absolute paths
-pretrained_model: /path/to/StyleTTS2/Models/LibriTTS/epochs_2nd_00020.pth
+# Alternative: absolute paths (use your actual path)
+pretrained_model: C:/Projects/StyleTTS2/Models/LibriTTS/epochs_2nd_00020.pth
 ```
 
 ---

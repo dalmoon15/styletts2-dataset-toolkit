@@ -256,7 +256,7 @@ datasets/[dataset_name]/
 
 1. **Clone StyleTTS2 Repository**
    ```powershell
-   cd E:\AI
+   cd C:\Projects
    git clone https://github.com/yl4579/StyleTTS2.git
    cd StyleTTS2
    ```
@@ -275,7 +275,7 @@ datasets/[dataset_name]/
 
 ```powershell
 # Copy your dataset to StyleTTS2 folder
-cp -r E:\styletts2-dataset-toolkit\styletts2-setup\datasets\your_dataset E:\AI\StyleTTS2\Data\
+cp -r C:\Projects\styletts2-dataset-toolkit\styletts2-setup\datasets\your_dataset C:\Projects\StyleTTS2\Data\
 ```
 
 ### Configure Training
@@ -343,7 +343,7 @@ python inference.py --checkpoint log_dir/epoch_2nd_00020.pth --text "Hello, this
 
 1. **Copy checkpoint** to models folder:
    ```powershell
-   cp log_dir/epoch_2nd_00050.pth E:\styletts2-dataset-toolkit\styletts2-setup\models\custom\my_voice.pth
+   cp log_dir/epoch_2nd_00050.pth styletts2-setup\models\custom\custom_voice.pth
    ```
 
 2. **Launch StyleTTS2 UI**:

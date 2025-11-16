@@ -28,10 +28,8 @@ except ImportError:
     NUM2WORDS_AVAILABLE = False
     print("⚠️ num2words not installed. Text normalization will be limited.")
 
-# Add FFmpeg to PATH (for pydub audio processing)
-ffmpeg_path = r"E:\AI\tools\ffmpeg\bin"
-if ffmpeg_path not in os.environ['PATH']:
-    os.environ['PATH'] = f"{ffmpeg_path};{os.environ['PATH']}"
+# FFmpeg will be resolved from system PATH or FFMPEG_PATH environment variable
+# No hardcoded paths needed - rely on system configuration
 
 # Setup paths
 BASE_DIR = Path(__file__).parent

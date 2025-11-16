@@ -36,7 +36,7 @@ This guide walks you through preparing a dataset and fine-tuning StyleTTS2 for s
    ```
 
 2. **Stem separation** (HIGHLY RECOMMENDED):
-   - Launch: `E:\AI\stem-separation-webui\launch_stem_separation.bat`
+   - Launch: `stem-separation\launch_stem_separation.bat` (from toolkit directory)
    - Use **Demucs (htdemucs_ft)** model
    - Extract isolated vocals
    - This dramatically improves training quality!
@@ -242,7 +242,7 @@ After training:
 
 1. **Copy model checkpoint**:
    ```bash
-   cp epoch_2nd_00050.pth /path/to/styletts2/models/finetuned/your_model.pth
+   cp epoch_2nd_00050.pth models/custom/custom_voice.pth
    ```
 
 2. **Load in webui** (future feature - coming soon!)
@@ -365,8 +365,8 @@ tts-webui/styletts2/
 │       └── train_list.txt
 └── models/
     ├── base/              ← StyleTTS2 default models
-    └── finetuned/         ← Your custom models
-        └── your_model.pth
+    └── custom/            ← Your custom models
+        └── custom_voice.pth
 ```
 
 ---

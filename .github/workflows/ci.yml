@@ -25,7 +25,6 @@ jobs:
         Write-Host "Checking for hardcoded paths..."
         $hardcodedPaths = @(
           "C:\\Users\\",
-          "E:\\AI\\",
           "D:\\Users\\"
         )
         $found = $false

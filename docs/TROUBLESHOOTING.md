@@ -593,10 +593,10 @@ val_data: path/to/dataset/val_list.txt
 
 1. **Install FFmpeg:**
    - Download: https://www.gyan.dev/ffmpeg/builds/
-   - Extract to: `E:\AI\tools\ffmpeg\`
+   - Extract to: `C:\ffmpeg\`
 
 2. **Add to PATH:**
-   - Add: `E:\AI\tools\ffmpeg\bin`
+   - Add: `C:\ffmpeg\bin`
    - Restart PowerShell
 
 3. **Update launcher scripts** with correct FFmpeg path
@@ -659,9 +659,9 @@ val_data: path/to/dataset/val_list.txt
 
 4. **Set cache locations:**
    ```powershell
-   $env:HF_HOME = "E:\AI\.cache\huggingface"
-   $env:TORCH_HOME = "E:\AI\.cache\torch"
-   $env:PIP_CACHE_DIR = "E:\AI\.cache\pip"
+   $env:HF_HOME = "C:\.cache\huggingface"
+   $env:TORCH_HOME = "C:\.cache\torch"
+   $env:PIP_CACHE_DIR = "C:\.cache\pip"
    ```
 
 ---
@@ -692,7 +692,7 @@ val_data: path/to/dataset/val_list.txt
 4. **Retry with timeout increase:**
    ```python
    import torch
-   torch.hub.set_dir('/path/to/your/cache/torch')  # Custom cache location
+   torch.hub.set_dir('D:/ML_Cache/torch')  # Custom cache location
    ```
 
 ---
@@ -733,7 +733,7 @@ val_data: path/to/dataset/val_list.txt
    ```
 
 2. **Use shorter paths:**
-   - Move to `E:\toolkit\` instead of deep nested folders
+   - Move to `C:\toolkit\` or root drive instead of deep nested folders
 
 ### Antivirus interference
 
@@ -745,7 +745,7 @@ val_data: path/to/dataset/val_list.txt
 **Solutions:**
 
 1. **Add exclusions** for:
-   - `E:\styletts2-dataset-toolkit\`
+   - Your toolkit installation directory
    - Python installation directory
    - CUDA directories
 

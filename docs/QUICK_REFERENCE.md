@@ -67,7 +67,7 @@ models/               # Trained voice models
 
 ### Train Model
 ```powershell
-cd E:\AI\StyleTTS2
+cd C:\Projects\StyleTTS2
 python train_finetune.py --config_path ./Configs/config_ft.yml
 ```
 
@@ -89,7 +89,7 @@ pip install torch torchaudio --index-url https://download.pytorch.org/whl/cu121
 ### FFmpeg Not Found
 ```powershell
 # Add to PATH or update launcher scripts
-$env:PATH = "E:\AI\tools\ffmpeg\bin;$env:PATH"
+$env:PATH = "C:\ffmpeg\bin;$env:PATH"
 ```
 
 ---

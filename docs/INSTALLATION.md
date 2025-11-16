@@ -29,8 +29,8 @@ Complete installation instructions for the StyleTTS2 Dataset Toolkit on Windows.
 
 3. **FFmpeg** (for audio processing)
    - Download: https://www.gyan.dev/ffmpeg/builds/
-   - Extract to `E:\AI\tools\ffmpeg\` or update paths in launchers
-   - Add to PATH: `E:\AI\tools\ffmpeg\bin`
+   - Extract to `C:\ffmpeg\` or update paths in launchers
+   - Add to PATH: `C:\ffmpeg\bin`
 
 4. **Git** (optional, for cloning)
    - Download: https://git-scm.com/download/win
@@ -43,14 +43,15 @@ Complete installation instructions for the StyleTTS2 Dataset Toolkit on Windows.
 
 **Option A: With Git**
 ```powershell
-cd E:\  # Or your preferred location
-git clone https://github.com/Lostenergydrink/styletts2-dataset-toolkit.git
+# Navigate to your preferred location
+cd C:\Projects  # Or any directory you prefer
+git clone https://github.com/YOUR_USERNAME/styletts2-dataset-toolkit.git
 cd styletts2-dataset-toolkit
 ```
 
 **Option B: Manual Download**
 1. Download ZIP from GitHub
-2. Extract to `E:\styletts2-dataset-toolkit\`
+2. Extract to your preferred location (e.g., `C:\Projects\styletts2-dataset-toolkit\`)
 3. Open PowerShell in that directory
 
 ### Step 2: Install Stem Separation
@@ -118,7 +119,6 @@ Add FFmpeg to your system PATH permanently.
 
 **Option C: Launcher Auto-Detection**
 The launchers will automatically try common locations:
-- `E:\AI\tools\ffmpeg\bin`
 - `C:\ffmpeg\bin`
 - `%ProgramFiles%\ffmpeg\bin`
 
@@ -235,7 +235,7 @@ pip install --upgrade styletts2 gradio
 ## 📁 Directory Structure After Installation
 
 ```
-E:\styletts2-dataset-toolkit\
+styletts2-dataset-toolkit\
 ├── stem-separation\
 │   ├── venv\                      # Virtual environment
 │   ├── stem_separation_webui.py
@@ -278,11 +278,11 @@ E:\styletts2-dataset-toolkit\
 ## 💡 Tips
 
 ### Storage Optimization
-- Store models on E: drive (if you have multiple drives)
+- Store models on a drive with sufficient space
 - Set cache directories:
   ```powershell
-  $env:HF_HOME = "E:\AI\.cache\huggingface"
-  $env:TORCH_HOME = "E:\AI\.cache\torch"
+  $env:HF_HOME = "C:\.cache\huggingface"
+  $env:TORCH_HOME = "C:\.cache\torch"
   ```
 
 ### Performance Optimization

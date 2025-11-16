@@ -4,11 +4,11 @@ A clean installation of StyleTTS2 with its own isolated virtual environment.
 
 ## 📁 Installation Location
 
-**Default Location:** `E:\AI\tts-webui\styletts2\`
+**Default Location:** Configurable via `STYLETTS2_PATH` environment variable
 
-**Note:** You can override the installation path by setting the `STYLETTS2_PATH` environment variable.
+**Note:** Set the `STYLETTS2_PATH` environment variable to your installation directory.
 
-- **Root Directory**: `E:\AI\tts-webui\styletts2\` (or `%STYLETTS2_PATH%`)
+- **Root Directory**: `%STYLETTS2_PATH%` (e.g., `C:\Projects\styletts2\`)
 - **Virtual Environment**: `.venv\`
 - **Models**: `models\`
 - **Outputs**: `outputs\`
@@ -30,8 +30,8 @@ launch_styletts2.bat
 
 **Option 3: Direct Python**
 ```powershell
-# Set path if using non-default location
-$env:STYLETTS2_PATH = "E:\AI\tts-webui\styletts2"
+# Set path to your installation directory
+$env:STYLETTS2_PATH = "C:\Projects\styletts2"
 cd $env:STYLETTS2_PATH
 & .venv\Scripts\Activate.ps1
 python styletts2_webui.py --server_port 7860
@@ -90,8 +90,8 @@ Each has its own virtual environment to prevent dependency conflicts.
 ### Model Loading Issues
 If the model fails to load, try:
 ```powershell
-# Set path if using non-default location
-$env:STYLETTS2_PATH = "E:\AI\tts-webui\styletts2"
+# Set path to your installation directory
+$env:STYLETTS2_PATH = "C:\Projects\styletts2"
 cd $env:STYLETTS2_PATH
 & .venv\Scripts\pip.exe install styletts2 --force-reinstall
 ```
@@ -99,7 +99,7 @@ cd $env:STYLETTS2_PATH
 ### Dependency Conflicts
 To reinstall dependencies:
 ```powershell
-$env:STYLETTS2_PATH = "E:\AI\tts-webui\styletts2"
+$env:STYLETTS2_PATH = "C:\Projects\styletts2"
 cd $env:STYLETTS2_PATH
 & .venv\Scripts\pip.exe install -r requirements.txt --force-reinstall
 ```
@@ -107,7 +107,7 @@ cd $env:STYLETTS2_PATH
 ### Virtual Environment Issues
 To recreate the virtual environment:
 ```powershell
-$env:STYLETTS2_PATH = "E:\AI\tts-webui\styletts2"
+$env:STYLETTS2_PATH = "C:\Projects\styletts2"
 cd $env:STYLETTS2_PATH
 Remove-Item -Path ".venv" -Recurse -Force
 python -m venv .venv

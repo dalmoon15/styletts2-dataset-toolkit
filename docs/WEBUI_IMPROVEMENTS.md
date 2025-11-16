@@ -69,9 +69,9 @@ Export process now automatically:
 ```
 ✅ Dataset exported successfully!
 
-Dataset: jinwoo-sung-v2
+Dataset: custom-voice-dataset
 Files: 42 audio + transcript pairs
-Location: E:\AI\tts-webui\styletts2\datasets\jinwoo-sung-v2
+Location: datasets\custom-voice-dataset
 Filelist: train_list.txt
 
 🔧 Normalization applied to 8 transcripts:
@@ -231,9 +231,9 @@ Potential improvements for later:
 
 **Option 2: Use standalone normalization script**
 ```powershell
-cd E:\AI\tts-webui\styletts2
-.\.venv\Scripts\python normalize_dataset.py datasets\old-dataset\train_list.txt --preview
-.\.venv\Scripts\python normalize_dataset.py datasets\old-dataset\train_list.txt --apply
+cd styletts2-setup
+python normalize_dataset.py datasets\old-dataset\train_list.txt --preview
+python normalize_dataset.py datasets\old-dataset\train_list.txt --apply
 ```
 
 ### If you manually edit transcripts:

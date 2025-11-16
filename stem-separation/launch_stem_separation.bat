@@ -37,10 +37,7 @@ if %ERRORLEVEL% EQU 0 (
             echo FFmpeg found at: %FFMPEG_PATH%
         )
     ) else (
-        if exist "E:\AI\tools\ffmpeg\bin\ffmpeg.exe" (
-            set PATH=E:\AI\tools\ffmpeg\bin;%PATH%
-            echo FFmpeg found at: E:\AI\tools\ffmpeg\bin
-        ) else if exist "C:\ffmpeg\bin\ffmpeg.exe" (
+        if exist "C:\ffmpeg\bin\ffmpeg.exe" (
             set PATH=C:\ffmpeg\bin;%PATH%
             echo FFmpeg found at: C:\ffmpeg\bin
         ) else (
@@ -58,18 +55,8 @@ if not "%CACHE_DIR%"=="" (
     set XDG_CACHE_HOME=%CACHE_DIR%
     echo Cache directory: %CACHE_DIR%
 ) else (
-    REM Try E: drive first (if available), otherwise use default locations
-    if exist "E:\" (
-        if not exist "E:\.cache" mkdir "E:\.cache" 2>nul
-        set PIP_CACHE_DIR=E:\.cache\pip
-        set HF_HOME=E:\.cache\huggingface
-        set TORCH_HOME=E:\.cache\torch
-        set XDG_CACHE_HOME=E:\.cache
-        echo Cache directory: E:\.cache
-    ) else (
-        REM Use default locations (will use user's AppData)
-        echo Using default cache locations
-    )
+    REM Use default system cache locations (typically %USERPROFILE%\.cache)
+    echo Using default cache locations
 )
 
 echo.
