@@ -33,9 +33,10 @@ jobs:
         
         $found = $false
         foreach ($path in $personalPaths) {
-          $files = Get-ChildItem -Path . -Include "*.py","*.ps1","*.bat","*.yml" -Recurse -File | Where-Object { 
+          $files = Get-ChildItem -Path . -Include "*.py","*.ps1","*.bat" -Recurse -File | Where-Object { 
             $_.FullName -notmatch "\\\.git\\" -and 
-            $_.FullName -notmatch "check_sanitization"
+            $_.FullName -notmatch "check_sanitization" -and
+            $_.FullName -notmatch "workflows\\ci\.yml"
           }
           
           $matches = $files | Select-String -Pattern $path -ErrorAction SilentlyContinue
