@@ -23,6 +23,8 @@ A comprehensive toolkit for isolating vocals, preparing datasets, and fine-tunin
 ### 🗣️ StyleTTS2 Integration **✨ ENHANCED**
 - **Auto-normalization** built into WebUI export (no manual fixes needed!)
 - **Safe slider limits** (3-30 seconds) prevent BERT token overflow
+- **Batch inference system** 🆕 Test all checkpoints, find best epoch
+- **Fine-tuned model WebUI** 🆕 Dedicated interface for trained voice
 - **Validation & normalization tools** catch issues before training
 - **CPU/CUDA auto-detection** with fallback support
 - **Windows DataLoader fixes** (no runaway processes)
@@ -188,9 +190,13 @@ styletts2-dataset-toolkit/
 │   ├── batch_inference_epochs.py    # 🆕 Test all checkpoints automatically
 │   ├── analyze_inference_results.py # 🆕 Statistical analysis & plots
 │   ├── inference_single_checkpoint.py # 🆕 Interactive single-checkpoint testing
+│   ├── finetuned_webui.py           # 🆕 Dedicated UI for trained model
 │   ├── run_batch_inference.bat      # 🆕 Test all 50 epochs (~1-2 hours)
 │   ├── run_batch_inference_sampled.bat # 🆕 Quick test every 5th epoch
 │   ├── run_interactive_inference.bat # 🆕 Interactive generation CLI
+│   ├── launch_finetuned_webui.bat   # 🆕 Launch fine-tuned model UI
+│   ├── run_finetune_safe.bat        # 🆕 Safe training launcher (CUDA flags, path fixes)
+│   ├── install_monotonic_align.py   # 🆕 Automated monotonic_align installer
 │   ├── train_styletts2.bat          # Training launcher
 │   ├── train_styletts2.ps1          # PowerShell training launcher
 │   ├── apply_patches.ps1            # ✨ Auto-apply code patches
@@ -210,6 +216,9 @@ styletts2-dataset-toolkit/
 │   ├── DATASET_PREP_GUIDE.md        # ✨ Updated with auto-normalization
 │   ├── DATASET_REQUIREMENTS.md      # ✨ Critical constraints explained
 │   ├── BATCH_INFERENCE_GUIDE.md     # 🆕 Checkpoint evaluation system
+│   ├── FINETUNED_MODEL_DEPLOYMENT.md # 🆕 Production deployment guide
+│   ├── DEPENDENCY_MANAGEMENT.md     # 🆕 Package conflicts & solutions
+│   ├── WINDOWS_TRAINING_ISSUES.md   # 🆕 Windows-specific fixes (7 critical issues)
 │   ├── WEBUI_IMPROVEMENTS.md        # ✨ Technical changelog
 │   └── TROUBLESHOOTING.md           # Common issues & solutions
 │

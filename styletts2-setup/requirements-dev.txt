@@ -1,0 +1,68 @@
+# Development & Testing Dependencies
+# Install after main requirements.txt:
+#   pip install -r requirements-dev.txt
+
+# ============================================================================
+# Testing Framework
+# ============================================================================
+pytest>=7.4.0
+pytest-cov>=4.1.0          # Coverage reporting
+pytest-xdist>=3.3.0        # Parallel test execution
+pytest-timeout>=2.1.0      # Test timeouts
+
+# ============================================================================
+# Code Quality & Linting
+# ============================================================================
+ruff>=0.14.0               # Fast Python linter (replaces flake8, black, isort)
+mypy>=1.0.0                # Static type checking
+types-PyYAML               # Type stubs for PyYAML
+types-requests             # Type stubs for requests
+
+# ============================================================================
+# Documentation
+# ============================================================================
+sphinx>=7.2.0              # Documentation generation
+sphinx-rtd-theme>=2.0.0    # Read the Docs theme
+myst-parser>=2.0.0         # Markdown support for Sphinx
+
+# ============================================================================
+# Notebook Development (Optional)
+# ============================================================================
+jupyter>=1.0.0
+ipython>=8.12.0
+ipykernel>=6.25.0
+ipywidgets>=8.1.0
+
+# ============================================================================
+# Profiling & Debugging
+# ============================================================================
+line_profiler>=4.1.0       # Line-by-line profiling
+memory_profiler>=0.61.0    # Memory usage profiling
+py-spy>=0.3.14             # Sampling profiler
+
+# ============================================================================
+# Development Utilities
+# ============================================================================
+pre-commit>=3.5.0          # Git pre-commit hooks
+black>=23.9.0              # Code formatter (if not using ruff format)
+isort>=5.12.0              # Import sorting (if not using ruff)
+
+# ============================================================================
+# USAGE EXAMPLES
+# ============================================================================
+#
+# Run tests with coverage:
+#   pytest tests/ --cov=styletts2-setup --cov-report=html
+#
+# Type check:
+#   mypy styletts2-setup/
+#
+# Lint with ruff:
+#   ruff check styletts2-setup/
+#   ruff format styletts2-setup/
+#
+# Profile script:
+#   python -m line_profiler script.py
+#
+# Setup pre-commit hooks:
+#   pre-commit install
