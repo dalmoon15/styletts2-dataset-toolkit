@@ -13,6 +13,7 @@ Write-Host "========================================" -ForegroundColor Cyan
 Write-Host ""
 
 # Define patterns to search for (personal references that should be removed/generalized)
+# NOTE: Generic documentation examples like "C:\Users\YourName" are intentionally NOT flagged
 $patterns = @{
     "E: Drive References" = @(
         "E:\\AI\\",
@@ -22,20 +23,16 @@ $patterns = @{
     )
     "Personal Usernames" = @(
         "Lostenergydrink",
-        "JinwooSung",
-        "\\Lost\\",
-        "/Lost/"
+        "JinwooSung"
     )
-    "Personal Paths" = @(
+    "Personal User Paths" = @(
         "C:\\Users\\Lost",
-        "my_voice",
-        "my-voice",
-        "your_model\.pth"
+        "\\Lost\\Videos",
+        "\\Lost\\Music"
     )
-    "Suspicious Placeholders" = @(
-        "/path/to/",
-        "your_voice",
-        "finetuned/your"
+    "Personal Identifiers" = @(
+        "my_voice",
+        "my-voice"
     )
 }
 
@@ -50,7 +47,6 @@ $excludePatterns = @(
 )
 
 $totalIssues = 0
-$fileResults = @{}
 
 # Get all text files (code, docs, config)
 $extensions = @("*.md", "*.py", "*.ps1", "*.bat", "*.yml", "*.yaml", "*.txt", "*.json")
@@ -78,16 +74,16 @@ foreach ($category in $patterns.Keys) {
             try {
                 $content = Get-Content $file.FullName -Raw -ErrorAction SilentlyContinue
                 if ($content -match $pattern) {
-                    $matches = Select-String -Path $file.FullName -Pattern $pattern -AllMatches
+                    $foundMatches = Select-String -Path $file.FullName -Pattern $pattern -AllMatches
                     
-                    if ($matches) {
+                    if ($foundMatches) {
                         $relativePath = $file.FullName.Replace((Get-Location).Path + "\", "")
                         
                         if (-not $categoryFiles.ContainsKey($relativePath)) {
                             $categoryFiles[$relativePath] = @()
                         }
                         
-                        foreach ($match in $matches) {
+                        foreach ($match in $foundMatches) {
                             $categoryFiles[$relativePath] += @{
                                 Pattern = $pattern
                                 Line = $match.LineNumber

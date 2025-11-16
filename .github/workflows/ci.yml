@@ -22,25 +22,38 @@ jobs:
     
     - name: Check for hardcoded paths
       run: |
-        Write-Host "Checking for hardcoded paths..."
-        $hardcodedPaths = @(
-          "C:\\Users\\",
-          "D:\\Users\\"
+        Write-Host "Checking for hardcoded personal paths..."
+        
+        # Patterns to search for (actual problematic hardcoded paths)
+        $personalPaths = @(
+          "C:\\Users\\Lost",
+          "E:\\AI\\",
+          "D:\\Users\\Lost"
         )
+        
         $found = $false
-        foreach ($path in $hardcodedPaths) {
-          $files = Get-ChildItem -Path . -Include "*.py","*.ps1","*.bat" -Recurse -File | Where-Object { $_.FullName -notmatch "\\\.git\\" }
+        foreach ($path in $personalPaths) {
+          $files = Get-ChildItem -Path . -Include "*.py","*.ps1","*.bat","*.yml" -Recurse -File | Where-Object { 
+            $_.FullName -notmatch "\\\.git\\" -and 
+            $_.FullName -notmatch "check_sanitization"
+          }
+          
           $matches = $files | Select-String -Pattern $path -ErrorAction SilentlyContinue
+          
           if ($matches) {
-            Write-Host "::error::Found hardcoded path: $path"
+            Write-Host "::error::Found personal hardcoded path: $path"
             $matches | ForEach-Object { Write-Host "  - $($_.Path):$($_.LineNumber)" }
             $found = $true
           }
         }
+        
         if ($found) {
+          Write-Host "::error::Personal paths detected! These must be removed before merge."
           exit 1
         }
-        Write-Host "✓ No hardcoded paths found"
+        
+        Write-Host "✓ No personal hardcoded paths found"
+        Write-Host "  Note: Generic examples like 'C:\Users\YourName' are allowed"
     
     - name: Validate .gitignore
       run: |
