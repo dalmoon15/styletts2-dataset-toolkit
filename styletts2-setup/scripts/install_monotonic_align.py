@@ -223,7 +223,7 @@ def main():
     print("✅ SUCCESS: monotonic_align installed and tested")
     print("="*70)
     print("\nYou can now run StyleTTS2 training:")
-    print("  run_finetune_safe.bat")
+    print("  launchers\\run_finetune_safe.bat")
     print("  or: python StyleTTS2/train_finetune.py")
     print()
 

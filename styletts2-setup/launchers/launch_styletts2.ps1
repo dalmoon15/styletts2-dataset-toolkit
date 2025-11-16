@@ -16,8 +16,8 @@ Write-Host ""
 # Priority: 1. Environment variable, 2. Default location, 3. Current directory
 $STYLETTS2_BASE = $env:STYLETTS2_PATH
 if ([string]::IsNullOrEmpty($STYLETTS2_BASE)) {
-    # Use current directory as default
-    $STYLETTS2_BASE = Split-Path -Parent $MyInvocation.MyCommand.Path
+    # Script is now in launchers/ subfolder, go up one level to styletts2-setup/
+    $STYLETTS2_BASE = Split-Path -Parent (Split-Path -Parent $MyInvocation.MyCommand.Path)
     if (-not (Test-Path "$STYLETTS2_BASE\styletts2_webui.py")) {
         # Fallback to current directory (for portable installations)
         $STYLETTS2_BASE = $PSScriptRoot

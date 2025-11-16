@@ -20,12 +20,12 @@ A clean installation of StyleTTS2 with its own isolated virtual environment.
 
 **Option 1: PowerShell Script (Recommended)**
 ```powershell
-.\launch_styletts2.ps1
+.\launchers\launch_styletts2.ps1
 ```
 
 **Option 2: Batch File**
 ```batch
-launch_styletts2.bat
+launchers\launch_styletts2.bat
 ```
 
 **Option 3: Direct Python**

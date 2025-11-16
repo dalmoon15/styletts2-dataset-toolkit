@@ -277,7 +277,7 @@ After training:
 - **Prevention:** Use the updated WebUI which handles this automatically
 - **Manual fix:** If you manually edited transcripts, run:
   ```powershell
-  python styletts2-setup/normalize_dataset.py datasets/your-dataset/train_list.txt --apply
+  python styletts2-setup/scripts/normalize_dataset.py datasets/your-dataset/train_list.txt --apply
   ```
 
 **"Expanded size of tensor (646) must match existing size (512)" - BERT token limit:**

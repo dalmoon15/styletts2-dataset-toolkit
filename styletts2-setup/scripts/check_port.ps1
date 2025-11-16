@@ -106,9 +106,9 @@ if ($List) {
         
         Write-Host ""
         Write-Host "Options:" -ForegroundColor Yellow
-        Write-Host "  1. Kill the process: .\check_port.ps1 -Port $Port -Kill" -ForegroundColor Gray
+        Write-Host "  1. Kill the process: ..\scripts\check_port.ps1 -Port $Port -Kill" -ForegroundColor Gray
         Write-Host "  2. Use a different port: python styletts2_webui.py --server_port 7865" -ForegroundColor Gray
-        Write-Host "  3. Check port range: .\check_port.ps1 -Port $Port -List" -ForegroundColor Gray
+        Write-Host "  3. Check port range: ..\scripts\check_port.ps1 -Port $Port -List" -ForegroundColor Gray
     } else {
         Write-Host "✓ Port $Port is FREE" -ForegroundColor Green
     }
@@ -116,7 +116,7 @@ if ($List) {
 
 Write-Host ""
 Write-Host "Examples:" -ForegroundColor Cyan
-Write-Host "  .\check_port.ps1 -Port 7860          # Check if port 7860 is free" -ForegroundColor Gray
-Write-Host "  .\check_port.ps1 -Port 7860 -Kill    # Kill process using port 7860" -ForegroundColor Gray
-Write-Host "  .\check_port.ps1 -Port 7860 -List    # List all ports 7860-7869" -ForegroundColor Gray
+Write-Host "  ..\scripts\check_port.ps1 -Port 7860          # Check if port 7860 is free" -ForegroundColor Gray
+Write-Host "  ..\scripts\check_port.ps1 -Port 7860 -Kill    # Kill process using port 7860" -ForegroundColor Gray
+Write-Host "  ..\scripts\check_port.ps1 -Port 7860 -List    # List all ports 7860-7869" -ForegroundColor Gray
 Write-Host ""

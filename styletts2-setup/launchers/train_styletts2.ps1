@@ -9,7 +9,8 @@ Write-Host "===============================================" -ForegroundColor Cy
 Write-Host ""
 
 # Set paths (relative to script directory)
-$SCRIPT_DIR = Split-Path -Parent $MyInvocation.MyCommand.Path
+# Script is now in launchers/ subfolder, go up one level to styletts2-setup/
+$SCRIPT_DIR = Split-Path -Parent (Split-Path -Parent $MyInvocation.MyCommand.Path)
 $VENV_PATH = "$SCRIPT_DIR\.venv"
 $TRAIN_SCRIPT = "$SCRIPT_DIR\StyleTTS2\train_finetune.py"
 $CONFIG_PATH = "$SCRIPT_DIR\StyleTTS2\Configs\config_ft.yml"
