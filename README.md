@@ -10,9 +10,9 @@ A comprehensive toolkit for isolating vocals, preparing datasets, and fine-tunin
 
 ---
 
-## 🌟 Features
+## 📌 Features
 
-### 🎵 Stem Separation (Enhanced)
+### 🎶 Stem Separation (Enhanced)
 - **Quality presets**: Fast / Balanced / High Quality / Maximum (Slow)
 - **Batch processing** from Gradio UI
 - **Aggressive vocal isolation** optimized for voice cloning
@@ -20,7 +20,7 @@ A comprehensive toolkit for isolating vocals, preparing datasets, and fine-tunin
 - **Model caching** for faster processing
 - **GPU-accelerated** with VRAM management
 
-### 🗣️ StyleTTS2 Integration **✨ ENHANCED**
+### 🗣️ StyleTTS2 Integration **🔥 ENHANCED**
 - **Auto-normalization** built into WebUI export (no manual fixes needed!)
 - **Safe slider limits** (3-30 seconds) prevent BERT token overflow
 - **Batch inference system** 🆕 Test all checkpoints, find best epoch
@@ -39,14 +39,14 @@ A comprehensive toolkit for isolating vocals, preparing datasets, and fine-tunin
 - **Automatic fixes** - WebUI converts "25" → "twenty five" during export
 - See [DATASET_REQUIREMENTS.md](docs/DATASET_REQUIREMENTS.md) for details
 
-### 📦 Complete Pipeline
+### 🎙️ Complete Pipeline
 ```
 Raw Audio → Stem Separation → Dataset Prep (Auto-normalized!) → Training → Custom Voice
 ```
 
 ---
 
-## 🚀 Quick Start
+## 🌌 Quick Start
 
 ### Prerequisites
 - **Windows 10/11**
@@ -90,9 +90,9 @@ pip install -r requirements.txt
 
 ---
 
-## 🎯 Usage Workflow
+## 📖 Usage Workflow
 
-### Step 1: Extract Clean Vocals 🎤
+### Step 1: Extract Clean Vocals 🎙️
 
 Launch the stem separation web UI:
 ```powershell
