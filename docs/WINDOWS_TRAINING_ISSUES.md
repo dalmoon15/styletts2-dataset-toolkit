@@ -277,24 +277,37 @@ Fatal Error: Unable to find python.exe at C:\Users\...\python.exe
 Venvs store absolute paths to original Python interpreter. Not portable.
 
 **Solution:**
-**ALWAYS use E-drive Python for venvs:**
+Use a stable Python installation that won't be deleted:
 
 ```powershell
-# WRONG - breaks if C-drive Python deleted
+# AVOID - breaks if Python is uninstalled later
+C:\Users\YourName\AppData\Local\Programs\Python\Python310\python.exe -m venv .venv
+
+# BETTER - use system-wide or dedicated Python installation
+# Option 1: System-wide Python
 C:\Python310\python.exe -m venv .venv
 
-# CORRECT - stable on E drive
-E:\AI\python\Python310\python.exe -m venv .venv
+# Option 2: Dedicated project Python on separate drive
+D:\python\Python310\python.exe -m venv .venv
 ```
 
-**E-Drive Policy (User Rule):**
-All AI tools, venvs, and dependencies → E drive, never C drive.
+**Best Practices:**
+- Install Python to a stable location you won't delete
+- Avoid user-specific AppData locations for shared projects
+- Consider using a dedicated drive for development tools
+- Document Python path in project README
 
 **Recovery if broken:**
 ```powershell
+# Remove broken venv
 Remove-Item .venv -Recurse -Force
-E:\AI\python\Python310\python.exe -m venv .venv
+
+# Recreate with stable Python installation
+path\to\stable\python.exe -m venv .venv
+
 # Re-install dependencies
+.venv\Scripts\activate
+pip install -r requirements.txt
 ```
 
 ---

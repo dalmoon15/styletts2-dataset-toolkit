@@ -53,15 +53,16 @@ $env:STEM_SEPARATION_PATH = "C:\MyProjects\stem-separation"
 
 **Path Resolution Priority:**
 1. `STYLETTS2_PATH` environment variable
-2. Default location: `E:\AI\tts-webui\styletts2`
+2. Default location: `C:\StyleTTS2` (configurable in script)
 3. Current directory (fallback for portable installations)
 
 **FFmpeg Resolution Priority:**
 1. System PATH
 2. `FFMPEG_PATH` environment variable
-3. `E:\AI\tools\ffmpeg\bin`
-4. `C:\ffmpeg\bin`
-5. `%ProgramFiles%\ffmpeg\bin`
+3. Common installation locations:
+   - `C:\ffmpeg\bin`
+   - `%ProgramFiles%\ffmpeg\bin`
+   - `%ProgramFiles(x86)%\ffmpeg\bin`
 6. `%ProgramFiles(x86)%\ffmpeg\bin`
 
 ### Stem Separation Launcher (`launch_stem_separation.bat`)
@@ -159,7 +160,7 @@ To set environment variables permanently (Windows):
 
 **Solutions:**
 1. Check if `STYLETTS2_PATH` is set correctly
-2. Verify the path exists: `Test-Path "E:\AI\tts-webui\styletts2\.venv"`
+2. Verify the path exists: `Test-Path "C:\path\to\styletts2\.venv"`
 3. Run installation script if venv doesn't exist
 
 ### "FFmpeg not found"
