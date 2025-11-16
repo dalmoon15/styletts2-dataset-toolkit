@@ -185,6 +185,12 @@ styletts2-dataset-toolkit/
 │   ├── validate_dataset.py          # ✨ Check transcripts for issues
 │   ├── normalize_dataset.py         # ✨ Fix existing datasets
 │   ├── check_port.ps1               # ✨ Port conflict management utility
+│   ├── batch_inference_epochs.py    # 🆕 Test all checkpoints automatically
+│   ├── analyze_inference_results.py # 🆕 Statistical analysis & plots
+│   ├── inference_single_checkpoint.py # 🆕 Interactive single-checkpoint testing
+│   ├── run_batch_inference.bat      # 🆕 Test all 50 epochs (~1-2 hours)
+│   ├── run_batch_inference_sampled.bat # 🆕 Quick test every 5th epoch
+│   ├── run_interactive_inference.bat # 🆕 Interactive generation CLI
 │   ├── train_styletts2.bat          # Training launcher
 │   ├── train_styletts2.ps1          # PowerShell training launcher
 │   ├── apply_patches.ps1            # ✨ Auto-apply code patches
@@ -203,6 +209,7 @@ styletts2-dataset-toolkit/
 │   ├── WORKFLOW_GUIDE.md            # Step-by-step workflow
 │   ├── DATASET_PREP_GUIDE.md        # ✨ Updated with auto-normalization
 │   ├── DATASET_REQUIREMENTS.md      # ✨ Critical constraints explained
+│   ├── BATCH_INFERENCE_GUIDE.md     # 🆕 Checkpoint evaluation system
 │   ├── WEBUI_IMPROVEMENTS.md        # ✨ Technical changelog
 │   └── TROUBLESHOOTING.md           # Common issues & solutions
 │
