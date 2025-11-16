@@ -242,7 +242,7 @@ After training:
 
 1. **Copy model checkpoint**:
    ```bash
-   cp epoch_2nd_00050.pth E:/AI/tts-webui/styletts2/models/finetuned/your_model.pth
+   cp epoch_2nd_00050.pth /path/to/styletts2/models/finetuned/your_model.pth
    ```
 
 2. **Load in webui** (future feature - coming soon!)

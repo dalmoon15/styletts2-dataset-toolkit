@@ -285,7 +285,7 @@ PLBERT_dir: Utils/PLBERT/
 **Important**: Use forward slashes `/` even on Windows, or absolute paths:
 ```yaml
 # Alternative: absolute paths
-pretrained_model: E:/AI/tts-webui/StyleTTS2/Models/LibriTTS/epochs_2nd_00020.pth
+pretrained_model: /path/to/StyleTTS2/Models/LibriTTS/epochs_2nd_00020.pth
 ```
 
 ---

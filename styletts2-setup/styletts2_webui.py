@@ -1401,7 +1401,7 @@ def create_ui():
                     gr.Markdown("#### 📁 Bulk Load from Folder")
                     batch_folder = gr.Textbox(
                         label="Text Files Folder",
-                        placeholder="E:\\AI\\tts-webui\\styletts2\\texts",
+                        placeholder="path/to/your/text/files",
                         value=""
                     )
                     

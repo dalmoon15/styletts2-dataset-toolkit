@@ -692,7 +692,7 @@ val_data: path/to/dataset/val_list.txt
 4. **Retry with timeout increase:**
    ```python
    import torch
-   torch.hub.set_dir('E:/AI/.cache/torch')
+   torch.hub.set_dir('/path/to/your/cache/torch')  # Custom cache location
    ```
 
 ---
