@@ -7,6 +7,9 @@ A comprehensive toolkit for isolating vocals, preparing datasets, and fine-tunin
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
 [![CUDA](https://img.shields.io/badge/CUDA-12.1+-green.svg)](https://developer.nvidia.com/cuda-downloads)
+[![GitHub release](https://img.shields.io/github/v/release/Lostenergydrink/styletts2-dataset-toolkit)](https://github.com/Lostenergydrink/styletts2-dataset-toolkit/releases)
+[![GitHub stars](https://img.shields.io/github/stars/Lostenergydrink/styletts2-dataset-toolkit?style=social)](https://github.com/Lostenergydrink/styletts2-dataset-toolkit/stargazers)
+[![CI Status](https://github.com/Lostenergydrink/styletts2-dataset-toolkit/workflows/CI/badge.svg)](https://github.com/Lostenergydrink/styletts2-dataset-toolkit/actions)
 
 ---
 
