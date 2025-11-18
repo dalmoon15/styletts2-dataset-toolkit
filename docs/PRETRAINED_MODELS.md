@@ -18,10 +18,62 @@ StyleTTS2 fine-tuning requires **4 types of pretrained models**:
 
 ---
 
-## 1. LibriTTS Pretrained Model
+## ⚠️ IMPORTANT: Choosing the Right Base Model (American vs British)
+
+### Accent Contamination Issue
+
+The pretrained model you choose will **significantly impact your fine-tuned voice's accent**, especially in longer generations. There are two primary options:
+
+| Model | Accent | Pros | Cons | Best For |
+|-------|--------|------|------|----------|
+| **LibriTTS** | British/Mixed | Well-tested, widely used | Can cause British accent bleed in fine-tuned models | European English projects |
+| **LJSpeech** | American English | Clean American accent base, no contamination | Less commonly documented | American English voice cloning |
+
+### Recommendation
+
+**If you want American English voices**, use the **LJSpeech** pretrained model instead of LibriTTS. This prevents accent contamination where British pronunciation bleeds through during longer speech generation.
+
+### Quick Setup for American English
+
+**Download LJSpeech Model:**
+```powershell
+# Create directory
+New-Item -ItemType Directory -Force -Path "StyleTTS2/Models/LJSpeech_American"
+
+# Download model (750 MB)
+# Model: https://huggingface.co/yl4579/StyleTTS2-LJSpeech/resolve/main/Models/LJSpeech/epoch_2nd_00100.pth
+# Config: https://huggingface.co/yl4579/StyleTTS2-LJSpeech/resolve/main/Models/LJSpeech/config.yml
+```
+
+**Update your config_ft.yml:**
+```yaml
+pretrained_model: "Models/LJSpeech_American/epoch_2nd_00100.pth"
+second_stage_load_pretrained: true
+```
+
+**LJSpeech Dataset Details:**
+- **Duration**: 24 hours of speech
+- **Speaker**: Single female (Linda Johnson)
+- **Quality**: Studio recordings
+- **Accent**: Standard American English (General American)
+
+### How Fine-tuning Works
+
+When you fine-tune:
+1. **Base model** provides accent foundation (American or British)
+2. **Your training data** adds voice characteristics (timbre, style, speaking pattern)
+3. **Result**: Your custom voice with the base model's accent
+
+Even though LJSpeech is single-speaker, StyleTTS2's architecture **supports multispeaker training** when you fine-tune with proper speaker IDs.
+
+---
+
+## 1. LibriTTS Pretrained Model (British/Mixed Accent)
 
 ### Purpose
 This is the main StyleTTS2 model checkpoint trained on the LibriTTS dataset. You will fine-tune this model on your custom voice data.
+
+**⚠️ Note**: This model contains British English accent bias. For American English voices, see the LJSpeech option above.
 
 ### Files Needed
 - **File**: `epochs_2nd_00020.pth`

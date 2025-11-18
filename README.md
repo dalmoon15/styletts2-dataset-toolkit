@@ -21,6 +21,7 @@ A comprehensive toolkit for isolating vocals, preparing datasets, and fine-tunin
 - **GPU-accelerated** with VRAM management
 
 ### 🗣️ StyleTTS2 Integration **🔥 ENHANCED**
+- **American vs British accent selection** 🆕 Choose pretrained model to match target accent
 - **Auto-normalization** built into WebUI export (no manual fixes needed!)
 - **Safe slider limits** (3-30 seconds) prevent BERT token overflow
 - **Batch inference system** 🆕 Test all checkpoints, find best epoch
@@ -279,9 +280,10 @@ Most ML voice cloning tools assume Linux. This toolkit is built for Windows user
 
 ### StyleTTS2
 - **Architecture**: Diffusion-based TTS with style encoder
-- **Pre-trained**: LibriTTS model
+- **Pre-trained Models**: LibriTTS (British/Mixed) or LJSpeech (American English)
+  - **⚠️ Important**: Choose model based on target accent - see [PRETRAINED_MODELS.md](docs/PRETRAINED_MODELS.md)
 - **Fine-tuning**: Compatible with official training scripts
-- **Features**: Voice cloning, style transfer, prosody control
+- **Features**: Voice cloning, style transfer, prosody control, multispeaker support
 
 ### System Requirements
 | Component | Minimum | Recommended |
@@ -346,7 +348,7 @@ Thank you to all the researchers and developers who made this toolkit possible!
 
 **StyleTTS2 Training:**
 - [StyleTTS2 Installation](docs/STYLETTS2_INSTALLATION.md) - Complete setup for fine-tuning
-- [Pretrained Models Guide](docs/PRETRAINED_MODELS.md) - Download and setup all required models
+- [Pretrained Models Guide](docs/PRETRAINED_MODELS.md) - **⚠️ IMPORTANT**: American vs British accent selection & model downloads
 - [WebUI Improvements](docs/WEBUI_IMPROVEMENTS.md) - Technical changelog of enhancements
 
 **Troubleshooting:**
