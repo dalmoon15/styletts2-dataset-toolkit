@@ -4,14 +4,12 @@ Automatically process multiple audio files through Demucs to extract vocals
 """
 
 import os
-import sys
 import torch
 from pathlib import Path
 import time
 import argparse
 from demucs.pretrained import get_model
 from demucs.apply import apply_model
-import demucs.separate
 import torchaudio
 
 # Parse command-line arguments
@@ -72,16 +70,23 @@ def process_batch():
     # Create output directory
     Path(OUTPUT_FOLDER).mkdir(parents=True, exist_ok=True)
     
-    # Find all MP3 files (exclude the combined one if present)
+    # Find all audio files (MP3 or WAV, exclude combined files)
     input_path = Path(INPUT_FOLDER)
     mp3_files = [f for f in input_path.glob("*.mp3") 
                  if "combined" not in f.name.lower()]
+    wav_files = [f for f in input_path.glob("*.wav")
+                 if "combined" not in f.name.lower()]
     
-    if not mp3_files:
-        print("❌ No MP3 files found!")
+    audio_files = mp3_files + wav_files
+    
+    if not audio_files:
+        print("❌ No audio files (MP3/WAV) found!")
         return
     
-    print(f"📁 Found {len(mp3_files)} MP3 files to process\n")
+    file_type = "WAV" if wav_files else "MP3"
+    if mp3_files and wav_files:
+        file_type = "MP3/WAV"
+    print(f"📁 Found {len(audio_files)} {file_type} file(s) to process\n")
     
     # Load model once
     print("⏳ Loading Demucs model (this may take a minute)...")
@@ -94,10 +99,10 @@ def process_batch():
     failed = []
     start_time = time.time()
     
-    for idx, audio_file in enumerate(mp3_files, 1):
+    for idx, audio_file in enumerate(audio_files, 1):
         try:
-            progress_pct = (idx-1) / len(mp3_files) * 100
-            print(f"[{idx}/{len(mp3_files)} - {progress_pct:.0f}%] Processing: {audio_file.name}")
+            progress_pct = (idx-1) / len(audio_files) * 100
+            print(f"[{idx}/{len(audio_files)} - {progress_pct:.0f}%] Processing: {audio_file.name}")
             file_start = time.time()
             
             # Validate file size
