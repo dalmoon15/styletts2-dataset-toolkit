@@ -30,6 +30,15 @@
 - **Speed:** ~2-3 minutes per minute of audio
 - **Best for:** Maximum quality vocal extraction for voice cloning datasets
 
+### Ultra (Research Grade) 🔥 ULTIMATE QUALITY
+- **Overlap:** 0.99 (99% overlap - research-grade quality)
+- **Split:** True (handles any file length)
+- **Shifts:** 5 (five augmentation passes)
+- **Speed:** ~6-10 minutes per minute of audio
+- **VRAM:** Maximizes RTX 3060 12GB
+- **Best for:** Eliminating stubborn music bleed, archival-quality vocal isolation
+- **Note:** Available via `batch_separate.py` command-line script
+
 ## Parameter Details
 
 ### Overlap
@@ -72,20 +81,68 @@ Test-time augmentation that processes the audio multiple times with random shift
 
 ## Performance Impact (RTX 3060, 3-minute song)
 
-| Preset | Processing Time | VRAM Usage | Quality Score |
-|--------|----------------|------------|---------------|
-| Fast | ~45 seconds | 2-3 GB | Good |
-| Balanced | ~1.5 minutes | 2-3 GB | Very Good |
-| High Quality | ~3-4 minutes | 3-4 GB | Excellent |
-| Maximum (Slow) | ~6-9 minutes | 4-6 GB | Outstanding |
+| Preset | Processing Time | VRAM Usage | Quality Score | Music Bleed |
+|--------|----------------|------------|---------------|-------------|
+| Fast | ~45 seconds | 2-3 GB | Good | Moderate |
+| Balanced | ~1.5 minutes | 2-3 GB | Very Good | Low |
+| High Quality | ~3-4 minutes | 3-4 GB | Excellent | Very Low |
+| Maximum (Slow) | ~6-9 minutes | 4-6 GB | Outstanding | Minimal |
+| **Ultra (Batch)** | **~18-30 minutes** | **6-9 GB** | **Research-Grade** | **Nearly Zero** |
+
+## Noise Filtering (Post-Processing) 🧹
+
+After stem separation, use the **batch_noise_filter.py** tool to clean up:
+- Birds chirping
+- Menu sounds / UI beeps
+- Outdoor ambient noise
+- Low-frequency rumble
+- Non-vocal background sounds
+
+### Noise Filtering Parameters
+
+**Reduction Strength** (0.0 - 1.0)
+- 0.3-0.5: Gentle cleanup, natural sound
+- 0.6-0.8: Aggressive removal for noisy sources
+- 1.0: Maximum reduction (may affect voice quality)
+
+**Gate Threshold** (-60 to -20 dB)
+- -40 dB: Standard (recommended)
+- -30 dB: More aggressive background removal
+- -50 dB: Gentler, preserves more ambience
+
+**Highpass Filter** (50-150 Hz)
+- 80 Hz: Standard for vocals (default)
+- 100-120 Hz: Aggressive rumble removal
+- 50-70 Hz: Preserve deep male voices
+
+### Two-Stage Workflow
+
+1. **First:** Stem separation (eliminates music)
+   - Use Maximum or Ultra quality for best results
+   - Focus: Remove instrumental content
+
+2. **Then:** Noise filtering (removes ambient sounds)
+   - Run `batch_noise_filter.py` on separated vocals
+   - Focus: Clean up environmental noise
+
+**Usage Example:**
+```powershell
+# Stage 1: Separate vocals with Ultra quality
+python batch_separate.py --input "C:\audio\songs" --model htdemucs_ft
+
+# Stage 2: Apply noise filtering
+python batch_noise_filter.py --input "C:\audio\songs\vocals_only" --strength 0.5
+```
 
 ## Tips for Best Results
 
-1. **Start with Maximum quality** for voice cloning - the quality difference is significant
-2. **Use Fast preset** to test if a song will separate well before committing to Maximum
-3. **Monitor VRAM** - if you get OOM errors with Maximum, try High Quality
-4. **WAV format** preserves maximum quality (no compression artifacts)
-5. **Source quality matters** - clean recordings separate better than compressed/low-quality audio
+1. **Use Ultra quality for voice cloning** - eliminates stubborn music bleed (batch script only)
+2. **Start with Fast preset** to test if a song will separate well before committing to Ultra
+3. **Apply noise filtering** if vocals have birds, menu sounds, or ambient noise
+4. **Monitor VRAM** - Ultra quality maximizes 12GB but won't overflow
+5. **Two-stage approach**: First separate (Ultra) → Then filter noise (batch_noise_filter.py)
+6. **WAV format** preserves maximum quality (no compression artifacts)
+7. **Source quality matters** - clean recordings separate better than compressed/low-quality audio
 
 ## Technical Background
 
