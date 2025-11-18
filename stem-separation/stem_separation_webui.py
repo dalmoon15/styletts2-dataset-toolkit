@@ -9,7 +9,7 @@ import sys
 import torch
 import gradio as gr
 from pathlib import Path
-import datetime
+from datetime import datetime
 import time
 from typing import Tuple, Optional
 import shutil
@@ -33,6 +33,16 @@ except ImportError:
     UVR_AVAILABLE = False
     print("⚠️ Audio Separator not installed. Install with: pip install audio-separator")
 
+# Try importing librosa for audio processing
+try:
+    import librosa
+    import soundfile as sf
+    import numpy as np
+    LIBROSA_AVAILABLE = True
+except ImportError:
+    LIBROSA_AVAILABLE = False
+    print("⚠️ Librosa not installed. Install with: pip install librosa soundfile")
+
 # Setup paths
 BASE_DIR = Path(__file__).parent
 OUTPUTS_DIR = Path(os.environ.get('STEM_OUTPUTS_DIR', BASE_DIR / 'stem-outputs'))
@@ -55,6 +65,7 @@ QUALITY_PRESETS = {
     "Balanced": {"overlap": 0.25, "split": True, "shifts": 0},
     "High Quality": {"overlap": 0.5, "split": True, "shifts": 1},
     "Maximum (Slow)": {"overlap": 0.75, "split": False, "shifts": 2},
+    "Ultra (Research Grade)": {"overlap": 0.99, "split": True, "shifts": 5},  # 🔥 Ultimate quality - very slow!
 }
 
 # Performance optimizations
@@ -468,6 +479,522 @@ def batch_separate_demucs(
         return error_msg
 
 
+def apply_noise_filtering(
+    audio_file: str,
+    noise_strength: float = 0.5,
+    gate_threshold: float = -40,
+    highpass_cutoff: float = 80,
+    progress=gr.Progress()
+) -> tuple[Optional[str], str]:
+    """Apply noise filtering to remove background sounds, birds, menu beeps, etc."""
+    if not audio_file or not os.path.exists(audio_file):
+        return None, "❌ Invalid audio file provided."
+    
+    try:
+        import torchaudio
+        import numpy as np
+        
+        progress(0.2, desc="Loading audio...")
+        print(f"\n🧹 Noise Filtering: {Path(audio_file).name}")
+        start_time = time.time()
+        
+        # Load audio
+        audio, sr = torchaudio.load(audio_file)
+        
+        progress(0.4, desc="Applying highpass filter...")
+        # Highpass filter to remove low rumble
+        try:
+            from scipy import signal
+            nyquist = sr / 2
+            normalized_cutoff = highpass_cutoff / nyquist
+            b, a = signal.butter(4, normalized_cutoff, btype='high')
+            
+            audio_np = audio.numpy()
+            for ch in range(audio_np.shape[0]):
+                audio_np[ch] = signal.filtfilt(b, a, audio_np[ch])
+            audio = torch.from_numpy(audio_np).float()
+            print(f"   ✅ Highpass filter applied ({highpass_cutoff} Hz)")
+        except ImportError:
+            print("   ⚠️  scipy not available, skipping highpass filter")
+        
+        progress(0.7, desc="Applying spectral gate...")
+        # Simple noise gate based on amplitude
+        threshold_linear = 10 ** (gate_threshold / 20)
+        mask = torch.abs(audio) > threshold_linear
+        
+        # Smooth the mask to avoid clicks
+        kernel_size = int(sr * 0.01)  # 10ms smoothing
+        if kernel_size % 2 == 0:
+            kernel_size += 1
+        
+        from torch.nn.functional import avg_pool1d
+        mask_float = mask.float().unsqueeze(0)
+        smoothed_mask = avg_pool1d(
+            mask_float, 
+            kernel_size=kernel_size, 
+            stride=1, 
+            padding=kernel_size//2
+        ).squeeze(0)
+        
+        # Apply with strength parameter
+        audio = audio * (noise_strength * smoothed_mask + (1 - noise_strength))
+        print(f"   ✅ Spectral gate applied ({gate_threshold} dB)")
+        
+        progress(0.9, desc="Normalizing and saving...")
+        # Normalize
+        max_val = torch.abs(audio).max()
+        if max_val > 0:
+            audio = audio / max_val * 0.95
+        
+        # Save
+        output_dir = OUTPUTS_DIR / "noise_filtered"
+        output_dir.mkdir(parents=True, exist_ok=True)
+        output_file = output_dir / Path(audio_file).name
+        
+        torchaudio.save(str(output_file), audio, sr)
+        
+        elapsed = time.time() - start_time
+        
+        success_msg = f"✅ Noise filtering complete!\n"
+        success_msg += f"⏱️  Time: {elapsed:.1f}s\n"
+        success_msg += f"📁 Output: {output_file.name}\n\n"
+        success_msg += "Filters applied:\n"
+        success_msg += f"  • Highpass: {highpass_cutoff} Hz\n"
+        success_msg += f"  • Gate threshold: {gate_threshold} dB\n"
+        success_msg += f"  • Reduction strength: {noise_strength*100:.0f}%"
+        
+        print(success_msg)
+        
+        return str(output_file), success_msg
+        
+    except Exception as e:
+        error_msg = f"❌ Error during noise filtering: {str(e)}"
+        print(error_msg)
+        import traceback
+        traceback.print_exc()
+        return None, error_msg
+
+
+def extract_audio_from_video(video_file, output_format="wav", audio_quality="320k", progress=gr.Progress()):
+    """Extract audio from video file using FFmpeg"""
+    if not video_file:
+        return None, "❌ Please upload a video file"
+    
+    if not FFMPEG_AVAILABLE:
+        return None, "❌ FFmpeg not found. Please install FFmpeg."
+    
+    try:
+        video_path = Path(video_file)
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        
+        # Generate output filename
+        output_filename = f"{video_path.stem}_{timestamp}.{output_format}"
+        output_path = OUTPUTS_DIR / "extracted_audio" / output_filename
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+        
+        print(f"📹 Extracting audio from: {video_path.name}")
+        print(f"   Format: {output_format.upper()}")
+        
+        progress(0.3, desc="Extracting audio...")
+        
+        # Build FFmpeg command
+        cmd = [
+            "ffmpeg",
+            "-i", str(video_path),
+            "-vn",  # No video
+            "-acodec", "pcm_s16le" if output_format == "wav" else "libmp3lame",
+        ]
+        
+        # Add quality settings for MP3
+        if output_format == "mp3":
+            cmd.extend(["-b:a", audio_quality])
+        
+        # Keep native sample rate (no resampling - preserve quality)
+        # Demucs will handle resampling if needed, training does final resample
+        cmd.extend([
+            # "-ar" not specified = keep original sample rate
+            "-ac", "2",      # Stereo (Demucs expects stereo input)
+            str(output_path)
+        ])
+        
+        # Run FFmpeg
+        result = subprocess.run(
+            cmd,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            text=True
+        )
+        
+        if result.returncode != 0:
+            return None, f"❌ FFmpeg error: {result.stderr[:500]}"
+        
+        progress(1.0, desc="Complete!")
+        
+        # Get file info
+        file_size = output_path.stat().st_size / 1024 / 1024  # MB
+        
+        success_msg = f"✅ Audio extracted successfully!\n\n"
+        success_msg += f"📁 Output: {output_filename}\n"
+        success_msg += f"💾 Size: {file_size:.1f} MB\n"
+        success_msg += f"🎵 Format: {output_format.upper()}\n"
+        success_msg += f"📊 Sample rate: Native (preserved from source)\n"
+        success_msg += f"🔊 Channels: Stereo (for Demucs)"
+        
+        print(success_msg)
+        
+        return str(output_path), success_msg
+        
+    except Exception as e:
+        error_msg = f"❌ Error extracting audio: {str(e)}"
+        print(error_msg)
+        import traceback
+        traceback.print_exc()
+        return None, error_msg
+
+
+def batch_extract_audio(folder_path, output_format="wav", audio_quality="320k", progress=gr.Progress()):
+    """Batch extract audio from all videos in a folder"""
+    if not folder_path or not Path(folder_path).exists():
+        return None, "❌ Invalid folder path"
+    
+    if not FFMPEG_AVAILABLE:
+        return None, "❌ FFmpeg not found. Please install FFmpeg."
+    
+    try:
+        folder = Path(folder_path)
+        
+        # Find all video files
+        video_extensions = ['.mp4', '.mkv', '.avi', '.mov', '.webm', '.flv', '.wmv', '.m4v']
+        video_files = []
+        for ext in video_extensions:
+            video_files.extend(folder.glob(f"*{ext}"))
+        
+        if not video_files:
+            return None, f"❌ No video files found in folder"
+        
+        print(f"\n{'='*70}")
+        print(f"📹 Batch Audio Extraction")
+        print(f"{'='*70}")
+        print(f"Found {len(video_files)} video files")
+        print(f"Output format: {output_format.upper()}")
+        print(f"{'='*70}\n")
+        
+        # Create output directory
+        output_dir = OUTPUTS_DIR / "extracted_audio" / "batch"
+        output_dir.mkdir(parents=True, exist_ok=True)
+        
+        successful = []
+        failed = []
+        
+        for idx, video_file in enumerate(video_files, 1):
+            try:
+                progress((idx-1)/len(video_files), desc=f"Processing {idx}/{len(video_files)}")
+                
+                print(f"[{idx}/{len(video_files)}] {video_file.name}")
+                
+                output_filename = f"{video_file.stem}.{output_format}"
+                output_path = output_dir / output_filename
+                
+                # Build FFmpeg command
+                cmd = [
+                    "ffmpeg",
+                    "-i", str(video_file),
+                    "-vn",
+                    "-acodec", "pcm_s16le" if output_format == "wav" else "libmp3lame",
+                ]
+                
+                if output_format == "mp3":
+                    cmd.extend(["-b:a", audio_quality])
+                
+                cmd.extend([
+                    # Keep native sample rate
+                    "-ac", "2",  # Stereo for Demucs
+                    "-y",  # Overwrite
+                    str(output_path)
+                ])
+                
+                result = subprocess.run(
+                    cmd,
+                    stdout=subprocess.PIPE,
+                    stderr=subprocess.PIPE,
+                    text=True
+                )
+                
+                if result.returncode == 0:
+                    file_size = output_path.stat().st_size / 1024 / 1024
+                    print(f"   ✅ Extracted: {file_size:.1f} MB\n")
+                    successful.append(output_filename)
+                else:
+                    print(f"   ❌ Failed: {result.stderr[:200]}\n")
+                    failed.append(video_file.name)
+                    
+            except Exception as e:
+                print(f"   ❌ Error: {e}\n")
+                failed.append(video_file.name)
+        
+        # Summary
+        print(f"\n{'='*70}")
+        print(f"✅ Batch extraction complete!")
+        print(f"   Successful: {len(successful)}/{len(video_files)}")
+        if failed:
+            print(f"   Failed: {len(failed)}")
+        print(f"📁 Output: {output_dir}")
+        print(f"{'='*70}\n")
+        
+        summary = f"✅ Batch extraction complete!\n\n"
+        summary += f"Processed: {len(successful)}/{len(video_files)} files\n"
+        summary += f"Output folder: {output_dir}\n\n"
+        
+        if successful:
+            summary += "Extracted files:\n" + "\n".join([f"• {f}" for f in successful[:10]])
+            if len(successful) > 10:
+                summary += f"\n... and {len(successful)-10} more"
+        
+        if failed:
+            summary += f"\n\n⚠️ Failed ({len(failed)}):\n" + "\n".join([f"• {f}" for f in failed[:5]])
+        
+        return str(output_dir), summary
+        
+    except Exception as e:
+        error_msg = f"❌ Error during batch extraction: {str(e)}"
+        print(error_msg)
+        import traceback
+        traceback.print_exc()
+        return None, error_msg
+
+
+def normalize_and_trim_audio(audio_file, target_lufs=-23.0, trim_silence=True, 
+                             top_db=40, padding_ms=100, progress=gr.Progress()):
+    """Normalize volume and optionally trim silence from audio file"""
+    if not audio_file:
+        return None, "❌ Please upload an audio file"
+    
+    if not LIBROSA_AVAILABLE:
+        return None, "❌ Librosa not installed. Install with: pip install librosa soundfile"
+    
+    try:
+        import pyloudnorm as pyln
+        LOUDNORM_AVAILABLE = True
+    except ImportError:
+        LOUDNORM_AVAILABLE = False
+    
+    try:
+        audio_path = Path(audio_file)
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        
+        print(f"🔊 Processing: {audio_path.name}")
+        progress(0.2, desc="Loading audio...")
+        
+        # Load audio
+        audio, sr = librosa.load(str(audio_path), sr=None, mono=False)
+        
+        # Handle stereo
+        if audio.ndim > 1:
+            audio = librosa.to_mono(audio)
+        
+        original_duration = len(audio) / sr
+        print(f"   Original: {original_duration:.2f}s, {sr}Hz")
+        
+        progress(0.4, desc="Trimming silence...")
+        
+        # Trim silence (leading and trailing)
+        if trim_silence:
+            audio_trimmed, trim_indices = librosa.effects.trim(
+                audio, 
+                top_db=top_db,
+                frame_length=2048,
+                hop_length=512
+            )
+            
+            # Add padding
+            padding_samples = int((padding_ms / 1000) * sr)
+            audio_trimmed = np.pad(audio_trimmed, padding_samples, mode='constant')
+            
+            trimmed_duration = len(audio_trimmed) / sr
+            removed_seconds = original_duration - trimmed_duration + (2 * padding_ms / 1000)
+            print(f"   Trimmed: {removed_seconds:.2f}s removed, {padding_ms}ms padding added")
+        else:
+            audio_trimmed = audio
+            print(f"   Silence trimming: Skipped")
+        
+        progress(0.6, desc="Normalizing volume...")
+        
+        # Volume normalization
+        if LOUDNORM_AVAILABLE:
+            # LUFS normalization (professional standard)
+            meter = pyln.Meter(sr)
+            loudness = meter.integrated_loudness(audio_trimmed)
+            audio_normalized = pyln.normalize.loudness(audio_trimmed, loudness, target_lufs)
+            norm_method = f"LUFS (target: {target_lufs} dB)"
+            print(f"   Original loudness: {loudness:.1f} LUFS")
+            print(f"   Target loudness: {target_lufs:.1f} LUFS")
+        else:
+            # RMS normalization (fallback)
+            rms = np.sqrt(np.mean(audio_trimmed**2))
+            target_rms = 0.1  # -20dBFS
+            audio_normalized = audio_trimmed * (target_rms / (rms + 1e-8))
+            # Prevent clipping
+            max_val = np.abs(audio_normalized).max()
+            if max_val > 0.99:
+                audio_normalized = audio_normalized * (0.99 / max_val)
+            norm_method = "RMS"
+            print(f"   RMS normalization applied")
+        
+        # Prevent clipping
+        max_val = np.abs(audio_normalized).max()
+        if max_val > 0.99:
+            audio_normalized = audio_normalized * (0.99 / max_val)
+            print(f"   Peak limiting applied (max: {max_val:.3f})")
+        
+        progress(0.8, desc="Saving...")
+        
+        # Save
+        output_filename = f"{audio_path.stem}_normalized_{timestamp}.wav"
+        output_path = OUTPUTS_DIR / "normalized" / output_filename
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+        
+        sf.write(str(output_path), audio_normalized, sr, subtype='PCM_16')
+        
+        file_size = output_path.stat().st_size / 1024 / 1024
+        final_duration = len(audio_normalized) / sr
+        
+        progress(1.0, desc="Complete!")
+        
+        success_msg = f"✅ Audio processed successfully!\n\n"
+        success_msg += f"📁 Output: {output_filename}\n"
+        success_msg += f"⏱️  Duration: {original_duration:.2f}s → {final_duration:.2f}s\n"
+        success_msg += f"🔊 Normalization: {norm_method}\n"
+        success_msg += f"✂️  Silence trimming: {'Yes' if trim_silence else 'No'}\n"
+        success_msg += f"💾 Size: {file_size:.1f} MB"
+        
+        print(success_msg)
+        
+        return str(output_path), success_msg
+        
+    except Exception as e:
+        error_msg = f"❌ Error processing audio: {str(e)}"
+        print(error_msg)
+        import traceback
+        traceback.print_exc()
+        return None, error_msg
+
+
+def batch_normalize_audio(folder_path, target_lufs=-23.0, trim_silence=True, 
+                          top_db=40, padding_ms=100, progress=gr.Progress()):
+    """Batch normalize and trim audio files"""
+    if not folder_path or not Path(folder_path).exists():
+        return None, "❌ Invalid folder path"
+    
+    if not LIBROSA_AVAILABLE:
+        return None, "❌ Librosa not installed. Install with: pip install librosa soundfile"
+    
+    try:
+        import pyloudnorm as pyln
+        LOUDNORM_AVAILABLE = True
+    except ImportError:
+        LOUDNORM_AVAILABLE = False
+        print("⚠️  Pyloudnorm not available, using RMS normalization")
+    
+    try:
+        folder = Path(folder_path)
+        
+        # Find all audio files
+        audio_files = list(folder.glob("*.wav")) + list(folder.glob("*.mp3"))
+        
+        if not audio_files:
+            return None, "❌ No audio files (WAV/MP3) found in folder"
+        
+        print(f"\n{'='*70}")
+        print(f"🔊 Batch Audio Normalization")
+        print(f"{'='*70}")
+        print(f"Found {len(audio_files)} audio files")
+        print(f"Normalization: {'LUFS' if LOUDNORM_AVAILABLE else 'RMS'}")
+        print(f"Silence trimming: {'Yes' if trim_silence else 'No'}")
+        print(f"{'='*70}\n")
+        
+        # Create output directory
+        output_dir = OUTPUTS_DIR / "normalized" / "batch"
+        output_dir.mkdir(parents=True, exist_ok=True)
+        
+        successful = []
+        failed = []
+        
+        for idx, audio_file in enumerate(audio_files, 1):
+            try:
+                progress((idx-1)/len(audio_files), desc=f"Processing {idx}/{len(audio_files)}")
+                
+                print(f"[{idx}/{len(audio_files)}] {audio_file.name}")
+                
+                # Load audio
+                audio, sr = librosa.load(str(audio_file), sr=None, mono=False)
+                if audio.ndim > 1:
+                    audio = librosa.to_mono(audio)
+                
+                # Trim silence
+                if trim_silence:
+                    audio, _ = librosa.effects.trim(audio, top_db=top_db)
+                    padding_samples = int((padding_ms / 1000) * sr)
+                    audio = np.pad(audio, padding_samples, mode='constant')
+                
+                # Normalize
+                if LOUDNORM_AVAILABLE:
+                    meter = pyln.Meter(sr)
+                    loudness = meter.integrated_loudness(audio)
+                    audio = pyln.normalize.loudness(audio, loudness, target_lufs)
+                else:
+                    rms = np.sqrt(np.mean(audio**2))
+                    audio = audio * (0.1 / (rms + 1e-8))
+                
+                # Prevent clipping
+                max_val = np.abs(audio).max()
+                if max_val > 0.99:
+                    audio = audio * (0.99 / max_val)
+                
+                # Save
+                output_filename = f"{audio_file.stem}_normalized.wav"
+                output_path = output_dir / output_filename
+                sf.write(str(output_path), audio, sr, subtype='PCM_16')
+                
+                file_size = output_path.stat().st_size / 1024 / 1024
+                duration = len(audio) / sr
+                print(f"   ✅ Processed: {duration:.2f}s, {file_size:.1f} MB\n")
+                successful.append(output_filename)
+                
+            except Exception as e:
+                print(f"   ❌ Error: {e}\n")
+                failed.append(audio_file.name)
+        
+        # Summary
+        print(f"\n{'='*70}")
+        print(f"✅ Batch processing complete!")
+        print(f"   Successful: {len(successful)}/{len(audio_files)}")
+        if failed:
+            print(f"   Failed: {len(failed)}")
+        print(f"📁 Output: {output_dir}")
+        print(f"{'='*70}\n")
+        
+        summary = f"✅ Batch processing complete!\n\n"
+        summary += f"Processed: {len(successful)}/{len(audio_files)} files\n"
+        summary += f"Output folder: {output_dir}\n\n"
+        
+        if successful:
+            summary += "Processed files:\n" + "\n".join([f"• {f}" for f in successful[:10]])
+            if len(successful) > 10:
+                summary += f"\n... and {len(successful)-10} more"
+        
+        if failed:
+            summary += f"\n\n⚠️ Failed ({len(failed)}):\n" + "\n".join([f"• {f}" for f in failed[:5]])
+        
+        return str(output_dir), summary
+        
+    except Exception as e:
+        error_msg = f"❌ Error during batch processing: {str(e)}"
+        print(error_msg)
+        import traceback
+        traceback.print_exc()
+        return None, error_msg
+
+
 def clear_vram():
     """Clear CUDA cache to free up VRAM"""
     if torch.cuda.is_available():
@@ -506,6 +1033,92 @@ with gr.Blocks(title="Stem Separation - Voice Isolation for Cloning", theme=gr.t
     """)
 
     with gr.Tabs():
+        # Video to Audio Tab (FIRST - pre-processing step)
+        with gr.TabItem("📹 Video → Audio"):
+            gr.Markdown("""
+            ### Extract Audio from Videos
+            First step in the pipeline: Convert video files to audio for stem separation.
+            
+            **Supports:** MP4, MKV, AVI, MOV, WebM, FLV, WMV, M4V
+            """)
+            
+            with gr.Row():
+                with gr.Column(scale=2):
+                    video_input = gr.File(
+                        label="📹 Upload Video File",
+                        file_types=["video"]
+                    )
+                    
+                    with gr.Row():
+                        video_format = gr.Dropdown(
+                            label="🎵 Output Format",
+                            choices=["wav", "mp3"],
+                            value="wav",
+                            info="WAV = lossless, MP3 = smaller file"
+                        )
+                        
+                        video_quality = gr.Dropdown(
+                            label="🎛️ MP3 Quality",
+                            choices=["128k", "192k", "256k", "320k"],
+                            value="320k",
+                            info="Only applies to MP3 format"
+                        )
+                    
+                    gr.Markdown("""
+                    **Quality Preservation:**
+                    - Keeps native sample rate (no resampling = better quality)
+                    - Stereo output (Demucs requirement)
+                    - Training handles final resample to 24kHz
+                    """)
+                    
+                    video_extract_btn = gr.Button("🎬 Extract Audio", variant="primary", size="lg")
+                
+                with gr.Column(scale=1):
+                    video_status = gr.Textbox(
+                        label="📊 Status",
+                        lines=8,
+                        interactive=False
+                    )
+                    video_output = gr.Audio(
+                        label="🎵 Extracted Audio",
+                        type="filepath"
+                    )
+            
+            gr.Markdown("---")
+            
+            # Batch extraction section
+            gr.Markdown("### 📦 Batch: Extract Audio from Multiple Videos")
+            
+            with gr.Row():
+                with gr.Column(scale=2):
+                    batch_video_folder = gr.Textbox(
+                        label="📁 Folder Path (containing videos)",
+                        placeholder=r"C:\Users\YourName\Videos\MyVideos",
+                        info="All video files in this folder will be processed"
+                    )
+                    
+                    with gr.Row():
+                        batch_video_format = gr.Dropdown(
+                            label="🎵 Output Format",
+                            choices=["wav", "mp3"],
+                            value="wav"
+                        )
+                        
+                        batch_video_quality = gr.Dropdown(
+                            label="🎛️ MP3 Quality",
+                            choices=["128k", "192k", "256k", "320k"],
+                            value="320k"
+                        )
+                    
+                    batch_video_btn = gr.Button("🎬 Batch Extract", variant="secondary", size="lg")
+                
+                with gr.Column(scale=1):
+                    batch_video_status = gr.Textbox(
+                        label="📊 Status",
+                        lines=10,
+                        interactive=False
+                    )
+        
         # Demucs Tab
         with gr.TabItem("🔥 Demucs (Best Quality)"):
             gr.Markdown("""
@@ -627,6 +1240,206 @@ with gr.Blocks(title="Stem Separation - Voice Isolation for Cloning", theme=gr.t
             - Output will be saved in: `stem-outputs/batch/[folder-name]/[model]/`
             """)
 
+        # Noise Reduction Tab
+        with gr.TabItem("🧹 Noise Reduction"):
+            gr.Markdown("""
+            ### Clean Up Background Noise
+            Remove birds chirping, menu sounds, ambient noise, and low-frequency rumble from vocal tracks.
+            **Perfect for cleaning up already-separated vocals!**
+            """)
+
+            with gr.Row():
+                with gr.Column(scale=2):
+                    noise_input = gr.Audio(
+                        label="🎤 Input Vocal File (WAV)",
+                        type="filepath"
+                    )
+
+                    with gr.Row():
+                        noise_strength = gr.Slider(
+                            label="🎚️ Reduction Strength",
+                            minimum=0.0,
+                            maximum=1.0,
+                            value=0.5,
+                            step=0.1,
+                            info="Higher = more aggressive noise removal"
+                        )
+
+                        gate_threshold = gr.Slider(
+                            label="🔇 Gate Threshold (dB)",
+                            minimum=-60,
+                            maximum=-20,
+                            value=-40,
+                            step=5,
+                            info="Remove sounds below this level"
+                        )
+
+                    highpass_cutoff = gr.Slider(
+                        label="🎛️ Highpass Filter (Hz)",
+                        minimum=50,
+                        maximum=150,
+                        value=80,
+                        step=10,
+                        info="Remove low-frequency rumble (voice starts ~80Hz)"
+                    )
+
+                    noise_btn = gr.Button("🧹 Clean Audio", variant="primary", size="lg")
+
+                with gr.Column(scale=1):
+                    noise_status = gr.Textbox(
+                        label="📊 Status",
+                        lines=12,
+                        interactive=False
+                    )
+
+            gr.Markdown("### 🔊 Cleaned Output")
+            noise_output = gr.Audio(label="🎤 Filtered Vocals", type="filepath")
+
+            gr.Markdown("""
+            ### 💡 Tips:
+            - **Strength 0.3-0.5**: Gentle cleanup, preserves natural sound
+            - **Strength 0.6-0.8**: Aggressive removal for noisy sources
+            - **Gate -40 dB**: Good starting point for most files
+            - **Gate -30 dB**: More aggressive, removes more background
+            - **Highpass 80 Hz**: Standard for vocals
+            - **Highpass 100-120 Hz**: More aggressive rumble removal
+            
+            Perfect for cleaning up vocals with birds, outdoor sounds, menu beeps, etc.
+            """)
+
+        # Volume Normalization Tab
+        with gr.TabItem("🔊 Volume Normalization & Trimming"):
+            gr.Markdown("""
+            ### Prepare Vocals for Training
+            Normalize volume levels and trim silence - **essential for consistent training datasets!**
+            
+            **Why this matters:**
+            - ✅ Consistent loudness across all training files
+            - ✅ No clipping or distortion
+            - ✅ Removes dead air at start/end
+            - ✅ Adds small padding for clean cuts
+            """)
+            
+            with gr.Row():
+                with gr.Column(scale=2):
+                    norm_input = gr.Audio(
+                        label="🎤 Input Vocal File",
+                        type="filepath"
+                    )
+                    
+                    with gr.Row():
+                        target_lufs = gr.Slider(
+                            label="🎚️ Target Loudness (LUFS)",
+                            minimum=-30,
+                            maximum=-15,
+                            value=-23,
+                            step=1,
+                            info="Broadcast standard: -23 LUFS (louder = higher number)"
+                        )
+                        
+                        trim_silence_toggle = gr.Checkbox(
+                            label="✂️ Trim Silence",
+                            value=True,
+                            info="Remove leading/trailing silence"
+                        )
+                    
+                    with gr.Row():
+                        trim_db = gr.Slider(
+                            label="🔇 Silence Threshold (dB)",
+                            minimum=20,
+                            maximum=60,
+                            value=40,
+                            step=5,
+                            info="Higher = more aggressive trimming"
+                        )
+                        
+                        padding_ms = gr.Slider(
+                            label="⏱️ Padding (ms)",
+                            minimum=0,
+                            maximum=500,
+                            value=100,
+                            step=50,
+                            info="Add small silence buffer at start/end"
+                        )
+                    
+                    norm_btn = gr.Button("🔊 Normalize & Trim", variant="primary", size="lg")
+                
+                with gr.Column(scale=1):
+                    norm_status = gr.Textbox(
+                        label="📊 Status",
+                        lines=12,
+                        interactive=False
+                    )
+            
+            gr.Markdown("### 🔊 Processed Output")
+            norm_output = gr.Audio(label="🎤 Normalized Vocals", type="filepath")
+            
+            gr.Markdown("---")
+            
+            # Batch normalization section
+            gr.Markdown("### 📦 Batch: Normalize Multiple Files")
+            
+            with gr.Row():
+                with gr.Column(scale=2):
+                    batch_norm_folder = gr.Textbox(
+                        label="📁 Folder Path (containing vocals)",
+                        placeholder=r"C:\Users\YourName\Music\vocals",
+                        info="All WAV/MP3 files will be processed"
+                    )
+                    
+                    with gr.Row():
+                        batch_target_lufs = gr.Slider(
+                            label="🎚️ Target Loudness (LUFS)",
+                            minimum=-30,
+                            maximum=-15,
+                            value=-23,
+                            step=1
+                        )
+                        
+                        batch_trim_toggle = gr.Checkbox(
+                            label="✂️ Trim Silence",
+                            value=True
+                        )
+                    
+                    with gr.Row():
+                        batch_trim_db = gr.Slider(
+                            label="🔇 Silence Threshold (dB)",
+                            minimum=20,
+                            maximum=60,
+                            value=40,
+                            step=5
+                        )
+                        
+                        batch_padding_ms = gr.Slider(
+                            label="⏱️ Padding (ms)",
+                            minimum=0,
+                            maximum=500,
+                            value=100,
+                            step=50
+                        )
+                    
+                    batch_norm_btn = gr.Button("🔊 Batch Normalize", variant="secondary", size="lg")
+                
+                with gr.Column(scale=1):
+                    batch_norm_status = gr.Textbox(
+                        label="📊 Status",
+                        lines=12,
+                        interactive=False
+                    )
+            
+            gr.Markdown("""
+            ### 💡 Recommended Settings for Training:
+            - **LUFS -23 dB**: Broadcast standard, good for most TTS models
+            - **Trim Silence: ON**: Removes wasted silence
+            - **Threshold 40 dB**: Good balance (lower = more aggressive)
+            - **Padding 100ms**: Small buffer prevents abrupt cuts
+            
+            **Note:** Requires `librosa`, `soundfile`, and optionally `pyloudnorm` (better quality)
+            ```bash
+            pip install librosa soundfile pyloudnorm
+            ```
+            """)
+
         # UVR Tab
         with gr.TabItem("⚡ UVR Models (Fast)"):
             gr.Markdown("""
@@ -731,6 +1544,19 @@ with gr.Blocks(title="Stem Separation - Voice Isolation for Cloning", theme=gr.t
     """)
 
     # Event handlers
+    # Video extraction handlers
+    video_extract_btn.click(
+        fn=extract_audio_from_video,
+        inputs=[video_input, video_format, video_quality],
+        outputs=[video_output, video_status]
+    )
+    
+    batch_video_btn.click(
+        fn=batch_extract_audio,
+        inputs=[batch_video_folder, batch_video_format, batch_video_quality],
+        outputs=[video_output, batch_video_status]
+    )
+    
     demucs_btn.click(
         fn=separate_with_demucs,
         inputs=[demucs_input, demucs_model, demucs_format, demucs_quality],
@@ -753,6 +1579,28 @@ with gr.Blocks(title="Stem Separation - Voice Isolation for Cloning", theme=gr.t
         fn=separate_with_uvr,
         inputs=[uvr_input, uvr_model, uvr_format],
         outputs=[uvr_primary, uvr_secondary, uvr_status]
+    ).then(
+        fn=list_output_files,
+        outputs=files_list
+    )
+
+    noise_btn.click(
+        fn=apply_noise_filtering,
+        inputs=[noise_input, noise_strength, gate_threshold, highpass_cutoff],
+        outputs=[noise_output, noise_status]
+    )
+    
+    # Normalization handlers
+    norm_btn.click(
+        fn=normalize_and_trim_audio,
+        inputs=[norm_input, target_lufs, trim_silence_toggle, trim_db, padding_ms],
+        outputs=[norm_output, norm_status]
+    )
+    
+    batch_norm_btn.click(
+        fn=batch_normalize_audio,
+        inputs=[batch_norm_folder, batch_target_lufs, batch_trim_toggle, batch_trim_db, batch_padding_ms],
+        outputs=[norm_output, batch_norm_status]
     ).then(
         fn=list_output_files,
         outputs=files_list
