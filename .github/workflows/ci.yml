@@ -98,10 +98,10 @@ jobs:
       run: |
         Write-Host "Checking for potential secrets..."
         $secretPatterns = @(
-          'api[_-]?key\s*=\s*[''"][^''"]+[''"']',
-          'password\s*=\s*[''"][^''"]+[''"']',
-          'token\s*=\s*[''"][^''"]+[''"']',
-          'secret\s*=\s*[''"][^''"]+[''"']'
+          "api[_-]?key\s*=\s*[\x27\x22][^\x27\x22]+[\x27\x22]",
+          "password\s*=\s*[\x27\x22][^\x27\x22]+[\x27\x22]",
+          "token\s*=\s*[\x27\x22][^\x27\x22]+[\x27\x22]",
+          "secret\s*=\s*[\x27\x22][^\x27\x22]+[\x27\x22]"
         )
         $found = $false
         foreach ($pattern in $secretPatterns) {
